@@ -1,0 +1,3083 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rotation Board — Team Scheduler</title>
+</head>
+<body>
+<!-- ============ CTS SNIPPET START — paste from here into the SharePoint Embed / modern Script Editor web part ============ -->
+<div id="cts-app">
+<style>
+/* All rules scoped under #cts-app — safe inside SharePoint modern pages */
+#cts-app{--cts-ink:#10151F;--cts-panel:#161D2A;--cts-card:#1C2534;--cts-line:#2C3648;
+ --cts-text:#E8EDF4;--cts-mut:#8B96A8;--cts-green:#00A76F;--cts-green-soft:rgba(0,167,111,.14);
+ --cts-amber:#E8A33D;--cts-amber-soft:rgba(232,163,61,.14);--cts-red:#E05252;--cts-red-soft:rgba(224,82,82,.14);
+ --cts-blue:#4C8DDA;--cts-blue-soft:rgba(76,141,218,.14);--cts-mono:Consolas,'SF Mono','Cascadia Mono',Menlo,monospace;
+ font-family:'Segoe UI',system-ui,-apple-system,sans-serif;color:var(--cts-text);
+ background:var(--cts-ink);border-radius:10px;padding:0;max-width:1200px;margin:0 auto;
+ box-shadow:0 8px 30px rgba(0,0,0,.35);overflow:hidden;font-size:14px;line-height:1.45}
+#cts-app *{box-sizing:border-box}
+#cts-app button{font-family:inherit;cursor:pointer}
+#cts-app input,#cts-app select,#cts-app textarea{font-family:inherit;font-size:13px;background:var(--cts-ink);
+ color:var(--cts-text);border:1px solid var(--cts-line);border-radius:6px;padding:6px 8px}
+#cts-app input:focus,#cts-app select:focus,#cts-app textarea:focus,#cts-app button:focus-visible{outline:2px solid var(--cts-green);outline-offset:1px}
+
+/* Header */
+#cts-app .cts-head{display:flex;align-items:center;gap:14px;padding:16px 20px;
+ background:var(--cts-panel);border-bottom:1px solid var(--cts-line);flex-wrap:wrap}
+#cts-app .cts-badge{width:34px;height:34px;border-radius:8px;background:var(--cts-green-soft);
+ border:1px solid var(--cts-green);display:flex;align-items:center;justify-content:center;
+ font-family:var(--cts-mono);color:var(--cts-green);font-weight:700;font-size:13px}
+#cts-app .cts-eyebrow{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--cts-mut)}
+#cts-app .cts-title{font-size:17px;font-weight:600;margin:0}
+#cts-app .cts-head-right{margin-left:auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+#cts-app .cts-sync{font-family:var(--cts-mono);font-size:11px;padding:4px 10px;border-radius:20px;
+ border:1px solid var(--cts-line);color:var(--cts-mut);white-space:nowrap}
+#cts-app .cts-sync.cts-sync-ok{border-color:var(--cts-green);color:var(--cts-green)}
+#cts-app .cts-sync.cts-sync-busy{border-color:var(--cts-amber);color:var(--cts-amber)}
+#cts-app .cts-sync.cts-sync-err{border-color:var(--cts-red);color:var(--cts-red)}
+#cts-app .cts-mode{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--cts-mut)}
+#cts-app .cts-switch{position:relative;width:40px;height:20px;background:var(--cts-line);
+ border-radius:20px;border:none;transition:background .15s}
+#cts-app .cts-switch::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;
+ border-radius:50%;background:var(--cts-mut);transition:transform .15s,background .15s}
+#cts-app .cts-switch.cts-on{background:var(--cts-green)}
+#cts-app .cts-switch.cts-on::after{transform:translateX(20px);background:#fff}
+
+/* Tabs */
+#cts-app .cts-tabs{display:flex;gap:2px;padding:0 20px;background:var(--cts-panel);
+ border-bottom:1px solid var(--cts-line);overflow-x:auto}
+#cts-app .cts-tab{background:none;border:none;color:var(--cts-mut);padding:11px 14px;font-size:13px;
+ border-bottom:2px solid transparent;white-space:nowrap;position:relative}
+#cts-app .cts-tab.cts-active{color:var(--cts-text);border-bottom-color:var(--cts-green)}
+#cts-app .cts-tab .cts-dot{display:inline-block;min-width:16px;height:16px;border-radius:8px;
+ background:var(--cts-amber);color:#231A05;font-size:10px;font-weight:700;line-height:16px;
+ text-align:center;margin-left:5px;padding:0 4px}
+#cts-app .cts-body{padding:18px 20px 22px}
+#cts-app .cts-hide{display:none!important}
+
+/* Buttons */
+#cts-app .cts-btn{background:var(--cts-card);border:1px solid var(--cts-line);color:var(--cts-text);
+ border-radius:7px;padding:7px 13px;font-size:13px;transition:border-color .12s}
+#cts-app .cts-btn:hover{border-color:var(--cts-green)}
+#cts-app .cts-btn-primary{background:var(--cts-green);border-color:var(--cts-green);color:#06231A;font-weight:600}
+#cts-app .cts-btn-danger{color:var(--cts-red)}
+#cts-app .cts-btn-amber{color:var(--cts-amber)}
+#cts-app .cts-btn-sm{padding:3px 8px;font-size:12px;border-radius:5px}
+
+/* Board grid */
+#cts-app .cts-toolbar{display:flex;gap:10px;align-items:center;margin-bottom:14px;flex-wrap:wrap}
+#cts-app .cts-weeklabel{font-family:var(--cts-mono);font-size:13px;color:var(--cts-mut)}
+#cts-app .cts-boardwrap{overflow-x:auto;border:1px solid var(--cts-line);border-radius:8px}
+#cts-app table.cts-board{border-collapse:collapse;width:100%;min-width:820px}
+#cts-app .cts-board th{background:var(--cts-panel);font-size:11px;letter-spacing:.08em;
+ text-transform:uppercase;color:var(--cts-mut);padding:9px 10px;text-align:left;
+ border-bottom:1px solid var(--cts-line);font-weight:600}
+#cts-app .cts-board th.cts-wkendcol{color:var(--cts-blue)}
+#cts-app .cts-board th .cts-date{display:block;font-family:var(--cts-mono);font-size:11px;
+ color:var(--cts-text);letter-spacing:0;text-transform:none;margin-top:2px}
+#cts-app .cts-board td{border-bottom:1px solid var(--cts-line);border-right:1px solid var(--cts-line);
+ padding:8px 10px;vertical-align:top;background:var(--cts-ink)}
+#cts-app .cts-board td:last-child{border-right:none}
+#cts-app .cts-taskcell{background:var(--cts-panel)!important;min-width:150px}
+#cts-app .cts-taskname{font-weight:600;font-size:13px}
+#cts-app .cts-tasksub{font-family:var(--cts-mono);font-size:11px;color:var(--cts-mut);margin-top:2px}
+#cts-app .cts-wetag{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--cts-blue);
+ border:1px solid var(--cts-blue);border-radius:4px;padding:1px 5px;margin-left:6px;vertical-align:1px}
+#cts-app .cts-chip{display:inline-flex;align-items:center;gap:6px;background:var(--cts-card);
+ border:1px solid var(--cts-line);border-radius:6px;padding:3px 8px;margin:2px 3px 2px 0;font-size:12px}
+#cts-app .cts-pips{font-family:var(--cts-mono);font-size:10px;letter-spacing:1px;color:var(--cts-green)}
+#cts-app .cts-pips .cts-off{color:var(--cts-line)}
+#cts-app .cts-chip.cts-training{border-color:var(--cts-amber);background:var(--cts-amber-soft)}
+#cts-app .cts-tag{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--cts-amber);font-weight:700}
+#cts-app .cts-role{font-size:9px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;border-radius:4px;padding:1px 5px}
+#cts-app .cts-role-trainer{color:var(--cts-blue);background:var(--cts-blue-soft);border:1px solid var(--cts-blue)}
+#cts-app .cts-role-trainee{color:var(--cts-amber);background:var(--cts-amber-soft);border:1px solid var(--cts-amber)}
+#cts-app .cts-trtag{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--cts-amber);
+ border:1px solid var(--cts-amber);border-radius:4px;padding:1px 5px;margin-left:6px;vertical-align:1px}
+#cts-app .cts-chip.cts-trainingcell{border-color:var(--cts-blue);background:var(--cts-blue-soft)}
+#cts-app .cts-debt{font-family:var(--cts-mono);font-size:10px;color:var(--cts-amber);margin-left:6px;white-space:nowrap}
+#cts-app .cts-trconf{background:var(--cts-ink);border:1px dashed var(--cts-amber);border-radius:8px;padding:10px 12px;margin:4px 0}
+#cts-app .cts-emppick{display:flex;gap:4px;flex-wrap:wrap}
+#cts-app .cts-empchk{border-radius:5px;border:1px solid var(--cts-line);background:var(--cts-ink);
+ color:var(--cts-mut);font-size:11px;padding:3px 8px}
+#cts-app .cts-empchk.cts-sel{background:var(--cts-amber-soft);border-color:var(--cts-amber);color:var(--cts-amber)}
+/* Avatars & people */
+#cts-app .cts-ava{width:26px;height:26px;border-radius:50%;object-fit:cover;vertical-align:middle;
+ border:1px solid var(--cts-line);background:var(--cts-card)}
+#cts-app .cts-ava-ph{display:inline-flex;width:26px;height:26px;border-radius:50%;background:var(--cts-card);
+ border:1px solid var(--cts-line);align-items:center;justify-content:center;font-family:var(--cts-mono);
+ font-size:10px;color:var(--cts-mut);vertical-align:middle}
+#cts-app .cts-roletag{font-size:9px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;
+ border-radius:4px;padding:1px 5px;margin-left:5px;vertical-align:1px}
+#cts-app .cts-roletag.cts-tl{color:var(--cts-blue);border:1px solid var(--cts-blue);background:var(--cts-blue-soft)}
+#cts-app .cts-roletag.cts-mgr{color:#C79BF2;border:1px solid #9B59D0;background:rgba(155,89,208,.15)}
+#cts-app .cts-esc{font-size:9px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;
+ color:var(--cts-red);border:1px dashed var(--cts-red);border-radius:4px;padding:1px 5px;margin-left:5px}
+#cts-app .cts-me{display:inline-flex;align-items:center;gap:7px;font-size:12px;color:var(--cts-text);
+ background:var(--cts-card);border:1px solid var(--cts-line);border-radius:20px;padding:3px 10px 3px 4px}
+#cts-app .cts-photo-in{width:0.1px;height:0.1px;opacity:0;overflow:hidden;position:absolute;z-index:-1}
+#cts-app .cts-baltag{font-size:9px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;
+ border-radius:4px;padding:1px 5px;margin-left:6px;vertical-align:1px}
+#cts-app .cts-baltag.cts-onbal{color:var(--cts-green);border:1px solid var(--cts-green);background:var(--cts-green-soft)}
+#cts-app .cts-baltag.cts-offbal{color:var(--cts-mut);border:1px solid var(--cts-line);background:var(--cts-card)}
+#cts-app .cts-noesctag{font-size:9px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;
+ color:var(--cts-mut);border:1px dashed var(--cts-mut);border-radius:4px;padding:1px 5px;margin-left:6px;vertical-align:1px}
+#cts-app .cts-absstat{font-family:var(--cts-mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;
+ font-weight:700;border-radius:4px;padding:1px 5px}
+#cts-app .cts-absstat.cts-ok{color:var(--cts-green);border:1px solid var(--cts-green)}
+#cts-app .cts-absstat.cts-pending{color:var(--cts-amber);border:1px solid var(--cts-amber)}
+#cts-app .cts-absstat.cts-rejected{color:var(--cts-red);border:1px solid var(--cts-red);text-decoration:line-through}
+#cts-app .cts-doclink{display:inline-block;font-family:var(--cts-mono);font-size:11px;color:var(--cts-blue);
+ border:1px solid var(--cts-blue);border-radius:5px;padding:2px 7px;margin:2px 4px 2px 0;text-decoration:none;max-width:180px;
+ overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:middle}
+#cts-app .cts-just{font-size:12px;color:var(--cts-mut);font-style:italic;margin-top:2px}
+#cts-app .cts-banner{display:flex;align-items:center;gap:12px;flex-wrap:wrap;border-radius:8px;
+ padding:10px 14px;margin-bottom:12px;font-size:13px}
+#cts-app .cts-banner-warn{background:var(--cts-amber-soft);border:1px solid var(--cts-amber);color:var(--cts-amber)}
+#cts-app .cts-banner-bad{background:var(--cts-red-soft);border:1px solid var(--cts-red);color:var(--cts-red)}
+#cts-app .cts-banner b{letter-spacing:.06em;text-transform:uppercase;font-size:11px}
+#cts-app .cts-shift{font-family:var(--cts-mono);font-size:9px;letter-spacing:.08em;color:var(--cts-blue);
+ background:var(--cts-blue-soft);border-radius:4px;padding:1px 5px;font-weight:700}
+#cts-app .cts-gap{color:var(--cts-red);font-family:var(--cts-mono);font-size:12px;
+ background:var(--cts-red-soft);border:1px dashed var(--cts-red);border-radius:6px;padding:3px 8px;display:inline-block;margin:2px 0}
+#cts-app .cts-na{color:var(--cts-line);font-family:var(--cts-mono);font-size:12px}
+#cts-app .cts-absrow td{background:var(--cts-panel);font-size:12px;color:var(--cts-mut)}
+#cts-app .cts-abschip{font-family:var(--cts-mono);font-size:11px;margin-right:8px;white-space:nowrap}
+#cts-app .cts-abschip.cts-sick{color:var(--cts-red)}
+#cts-app .cts-abschip.cts-vac{color:var(--cts-blue)}
+#cts-app .cts-abschip.cts-oth{color:var(--cts-amber)}
+#cts-app .cts-archnote{font-family:var(--cts-mono);font-size:11px;color:var(--cts-amber);
+ border:1px dashed var(--cts-amber);border-radius:6px;padding:4px 10px}
+
+/* Week/Month segmented toggle */
+#cts-app .cts-seg{display:inline-flex;border:1px solid var(--cts-line);border-radius:7px;overflow:hidden}
+#cts-app .cts-seg button{background:var(--cts-ink);border:none;color:var(--cts-mut);padding:6px 13px;font-size:12px}
+#cts-app .cts-seg button.cts-sel{background:var(--cts-green-soft);color:var(--cts-green);font-weight:600}
+#cts-app .cts-monthnav{display:inline-flex;align-items:center;gap:8px}
+#cts-app .cts-monthnav .cts-mlabel{font-family:var(--cts-mono);font-size:13px;min-width:92px;text-align:center}
+
+/* Month calendar */
+#cts-app .cts-cal{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:var(--cts-line);
+ border:1px solid var(--cts-line);border-radius:8px;overflow:hidden;min-width:840px}
+#cts-app .cts-calwrap{overflow-x:auto}
+#cts-app .cts-cal .cts-dow{background:var(--cts-panel);padding:7px 8px;font-size:10px;letter-spacing:.1em;
+ text-transform:uppercase;color:var(--cts-mut);font-weight:600}
+#cts-app .cts-cal .cts-dow.cts-wkendcol{color:var(--cts-blue)}
+#cts-app .cts-day{background:var(--cts-ink);min-height:86px;padding:6px 7px;font-size:11px}
+#cts-app .cts-day.cts-out{background:var(--cts-panel);opacity:.45}
+#cts-app .cts-day .cts-dnum{font-family:var(--cts-mono);font-size:11px;color:var(--cts-mut);margin-bottom:4px;display:flex;justify-content:space-between}
+#cts-app .cts-day .cts-dnum .cts-today{color:var(--cts-green);font-weight:700}
+#cts-app .cts-mini{display:block;border-left:2px solid var(--cts-green);padding:1px 0 1px 6px;margin:2px 0;
+ white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--cts-text)}
+#cts-app .cts-mini .cts-mtask{color:var(--cts-mut)}
+#cts-app .cts-mini.cts-mtrain{border-left-color:var(--cts-amber)}
+#cts-app .cts-mini.cts-mgap{border-left-color:var(--cts-red);color:var(--cts-red)}
+#cts-app .cts-mini .cts-mshift{font-family:var(--cts-mono);font-size:9px;color:var(--cts-blue)}
+#cts-app .cts-mini.cts-mabs{border-left-color:var(--cts-line);color:var(--cts-mut);font-style:italic}
+
+/* Panels below board */
+#cts-app .cts-panels{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
+@media(max-width:760px){#cts-app .cts-panels{grid-template-columns:1fr}}
+#cts-app .cts-cardbox{background:var(--cts-panel);border:1px solid var(--cts-line);border-radius:8px;padding:14px}
+#cts-app .cts-cardbox h3{margin:0 0 10px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--cts-mut)}
+#cts-app .cts-fairrow{display:flex;align-items:center;gap:10px;margin:6px 0;font-size:12px}
+#cts-app .cts-fairname{width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#cts-app .cts-fairbarwrap{flex:1;height:8px;background:var(--cts-ink);border-radius:4px;overflow:hidden}
+#cts-app .cts-fairbar{height:100%;background:var(--cts-green);border-radius:4px;transition:width .3s}
+#cts-app .cts-faircount{font-family:var(--cts-mono);width:24px;text-align:right;color:var(--cts-mut)}
+#cts-app .cts-risk{display:flex;justify-content:space-between;align-items:center;padding:6px 0;
+ border-bottom:1px solid var(--cts-line);font-size:12px}
+#cts-app .cts-risk:last-child{border-bottom:none}
+#cts-app .cts-risk-flag{font-family:var(--cts-mono);font-size:11px}
+#cts-app .cts-ok{color:var(--cts-green)}#cts-app .cts-warn{color:var(--cts-amber)}#cts-app .cts-bad{color:var(--cts-red)}
+
+/* Admin tables & forms */
+#cts-app table.cts-admin{border-collapse:collapse;width:100%}
+#cts-app .cts-admin th{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--cts-mut);
+ text-align:left;padding:8px;border-bottom:1px solid var(--cts-line);font-weight:600}
+#cts-app .cts-admin td{padding:7px 8px;border-bottom:1px solid var(--cts-line);font-size:13px}
+#cts-app .cts-lvlbtns{display:inline-flex;gap:3px}
+#cts-app .cts-lvl{width:24px;height:24px;border-radius:5px;border:1px solid var(--cts-line);
+ background:var(--cts-ink);color:var(--cts-mut);font-family:var(--cts-mono);font-size:11px;padding:0}
+#cts-app .cts-lvl.cts-sel{background:var(--cts-green-soft);border-color:var(--cts-green);color:var(--cts-green);font-weight:700}
+#cts-app .cts-formrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:12px 0}
+#cts-app .cts-daychecks{display:flex;gap:4px}
+#cts-app .cts-daychk{width:30px;height:26px;border-radius:5px;border:1px solid var(--cts-line);
+ background:var(--cts-ink);color:var(--cts-mut);font-size:11px;padding:0}
+#cts-app .cts-daychk.cts-sel{background:var(--cts-green-soft);border-color:var(--cts-green);color:var(--cts-green)}
+#cts-app .cts-note{font-size:12px;color:var(--cts-mut);margin-top:10px}
+#cts-app .cts-empty{color:var(--cts-mut);font-size:13px;padding:16px;text-align:center;
+ border:1px dashed var(--cts-line);border-radius:8px}
+#cts-app textarea.cts-json{width:100%;height:160px;background:var(--cts-ink);color:var(--cts-text);
+ border:1px solid var(--cts-line);border-radius:8px;font-family:var(--cts-mono);font-size:12px;padding:10px}
+
+/* Change requests */
+#cts-app .cts-req{background:var(--cts-panel);border:1px solid var(--cts-line);border-radius:8px;
+ padding:12px 14px;margin-bottom:10px}
+#cts-app .cts-req-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+#cts-app .cts-status{font-family:var(--cts-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+ border-radius:4px;padding:2px 7px;font-weight:700}
+#cts-app .cts-status.cts-pending{background:var(--cts-amber-soft);color:var(--cts-amber);border:1px solid var(--cts-amber)}
+#cts-app .cts-status.cts-approved{background:var(--cts-green-soft);color:var(--cts-green);border:1px solid var(--cts-green)}
+#cts-app .cts-status.cts-declined{background:var(--cts-red-soft);color:var(--cts-red);border:1px solid var(--cts-red)}
+#cts-app .cts-status.cts-alt{background:var(--cts-blue-soft);color:var(--cts-blue);border:1px solid var(--cts-blue)}
+#cts-app .cts-req-body{font-size:13px}
+#cts-app .cts-req-meta{font-family:var(--cts-mono);font-size:11px;color:var(--cts-mut);margin-top:4px}
+#cts-app .cts-req-actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;align-items:center}
+
+/* Ask AI */
+#cts-app .cts-chatlog{max-height:420px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
+#cts-app .cts-msg{border-radius:10px;padding:10px 13px;font-size:13px;max-width:88%;white-space:pre-wrap}
+#cts-app .cts-msg-q{background:var(--cts-card);border:1px solid var(--cts-line);align-self:flex-end}
+#cts-app .cts-msg-a{background:var(--cts-green-soft);border:1px solid var(--cts-green);align-self:flex-start}
+#cts-app .cts-msg-e{background:var(--cts-red-soft);border:1px solid var(--cts-red);align-self:flex-start}
+#cts-app .cts-askrow{display:flex;gap:8px}
+#cts-app .cts-askrow input{flex:1}
+#cts-app .cts-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+ background:var(--cts-card);border:1px solid var(--cts-green);color:var(--cts-text);
+ padding:9px 16px;border-radius:8px;font-size:13px;z-index:9999;box-shadow:0 6px 20px rgba(0,0,0,.4)}
+@media(prefers-reduced-motion:reduce){#cts-app *{transition:none!important}}
+</style>
+
+<div class="cts-head">
+  <div class="cts-badge">RB</div>
+  <div>
+    <div class="cts-eyebrow">Control Tower &middot; Operations</div>
+    <h1 class="cts-title">Rotation Board</h1>
+  </div>
+  <div class="cts-head-right">
+    <span id="cts-colabslot"></span>
+    <span class="cts-sync" id="cts-sync" title="Shared storage status">local only</span>
+    <div class="cts-mode">
+      <span>Consultation</span>
+      <button type="button" class="cts-switch" id="cts-adminToggle" aria-label="Toggle admin mode (password required)"></button>
+      <span>Admin</span>
+    </div>
+  </div>
+</div>
+
+<div class="cts-tabs" id="cts-tabs">
+  <button class="cts-tab cts-active" data-cts-tab="board">Board</button>
+  <button class="cts-tab" data-cts-tab="team">Team &amp; skills</button>
+  <button class="cts-tab" data-cts-tab="tasks">Positions</button>
+  <button class="cts-tab" data-cts-tab="merge">Merges</button>
+  <button class="cts-tab" data-cts-tab="abs">Absences</button>
+  <button class="cts-tab" data-cts-tab="req">Requests<span id="cts-reqdot"></span></button>
+  <button class="cts-tab" data-cts-tab="rules">Rules</button>
+  <button class="cts-tab" data-cts-tab="ai">Ask AI</button>
+  <button class="cts-tab" data-cts-tab="data">Data</button>
+</div>
+
+<div class="cts-body">
+  <div id="cts-view-board"></div>
+  <div id="cts-view-team" class="cts-hide"></div>
+  <div id="cts-view-tasks" class="cts-hide"></div>
+  <div id="cts-view-merge" class="cts-hide"></div>
+  <div id="cts-view-abs" class="cts-hide"></div>
+  <div id="cts-view-req" class="cts-hide"></div>
+  <div id="cts-view-rules" class="cts-hide"></div>
+  <div id="cts-view-ai" class="cts-hide"></div>
+  <div id="cts-view-data" class="cts-hide"></div>
+</div>
+</div>
+<script>
+(function(){
+"use strict";
+/* ============================================================
+   Rotation Board v2 — auto-scheduler for team positions
+   Weekday positions + weekend positions (Early/Late complementary
+   shifts + Mid). Password-gated admin. Change requests with
+   approve / decline / counter-proposal. Schedule archive with
+   historical import. Shared persistence via SharePoint List.
+   Optional AI Q&A over the data (Claude API).
+   No SPFx, no admin permissions, no external libraries.
+   ============================================================ */
+
+var LS_KEY = "cts_rotation_board_v1";
+var LS_AIKEY = "cts_ai_key";                 // API key stays LOCAL ONLY — never synced or exported
+var DAY_NAMES = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+var ABS_TYPES = {vac:"Vacation", sick:"Sick", oth:"Other"};
+var SHIFTS = [ {k:"S1",label:"Early"}, {k:"S2",label:"Late"}, {k:"MID",label:"Mid"} ];
+var DEFAULT_PW = "admin";
+
+/* ---------- state ---------- */
+function defaultState(){
+  return {
+    weekStart: nextMonday(),
+    includeWeekend: true,
+    trainingRate: 0.25,
+    adminHash: null,             // sha256 hex of admin password; null = default "admin"
+    employees: [],
+    tasks: [],
+    absences: [],
+    history: {},                 // empId -> taskId -> times assigned (all-time, incl. imports)
+    carry: {},                   // signed weekday workload carry (behind/ahead of fair share)
+    carryWe: {},                 // signed weekend workload carry
+    recup: {},                   // recuperation days owed after worked weekends
+    rules: {maxConsecutive:6, postWeekendCap:5},
+    merges: [],                  // ordered merge rules: [{id, a:taskId, b:taskId}] — tried top to bottom
+    requests: [],                // change requests, see newRequest()
+    archive: [],                 // past generated/imported weeks: {weekStart,days,cells,counts,generatedAt,source}
+    schedule: null
+  };
+}
+function migrate(s){
+  var d = defaultState();
+  ["requests","archive","absences"].forEach(function(k){ if(!Array.isArray(s[k])) s[k]=d[k]; });
+  if(!s.history) s.history={};
+  if(!s.carry) s.carry={};                   // weekday balance carry-over across weeks/months
+  if(!s.carryWe) s.carryWe={};               // weekend balance carry-over
+  if(!s.recup) s.recup={};                   // recuperation days still owed after worked weekends
+  if(!s.rules) s.rules={};
+  if(!s.rules.maxConsecutive) s.rules.maxConsecutive=6;   // hard wall: max workdays in a row
+  if(!s.rules.postWeekendCap) s.rules.postWeekendCap=5;   // max worked days in the week AFTER a worked weekend
+  if(!s.merges) s.merges=[];
+  s.merges.forEach(function(m){ if(m.resultName!==undefined){ delete m.resultName; } if(m.replaceTask===undefined) m.replaceTask=null; if(m.replaceName===undefined) m.replaceName=null; });
+  if(s.debt){                                // legacy training debt = "behind" = negative carry
+    Object.keys(s.debt).forEach(function(id){ s.carry[id]=(s.carry[id]||0)-(s.debt[id]||0); });
+    delete s.debt;
+  }
+  if(s.includeWeekend===undefined) s.includeWeekend=true;
+  if(s.trainingRate===undefined) s.trainingRate=0.25;
+  if(s.adminHash===undefined) s.adminHash=null;
+  (s.tasks||[]).forEach(function(t,ix){
+    if(!t.type) t.type="wk";
+    if(t.type==="we") t.days=[5,6];
+    if(t.balance===undefined) t.balance=true;     // false = extra position (projects, training...) outside workload balance
+    if(!t.minLevel || t.minLevel<2) t.minLevel=2; // level 1 = cannot do the task, so tasks require at least level 2
+    if(t.noEscalation===undefined) t.noEscalation=false; // true = never staffed by escalated leaders; stays unfilled instead
+    if(t.rank===undefined) t.rank=ix+1;           // fill priority: lower rank = filled first, ALWAYS
+    if(t.optional===undefined) t.optional=false;  // true = "suggest" position: staffed only with spare people
+    // training: per-day SESSIONS {date, trainerId, traineeIds[]}; legacy window converted
+    if(t.training===undefined || t.training===null){ t.training=null; }
+    else if(t.training && !t.training.sessions){
+      var old=t.training, sess=[];
+      if(old.from && old.to){
+        var dcur=old.from, guard=0;
+        while(dcur<=old.to && guard<62){
+          var di=dayIdxOf(dcur);
+          var active = t.type==="we" ? (di===5||di===6) : (t.days||[]).indexOf(di)>-1;
+          if(active) sess.push({id:uid(), date:dcur, trainerId:old.trainerId||"", traineeIds:(old.traineeIds||[]).slice()});
+          dcur=addDays(dcur,1); guard++;
+        }
+      }
+      t.training={sessions:sess};
+    }
+  });
+  (s.absences||[]).forEach(function(a){
+    if(a.status===undefined) a.status="ok";       // ok | pending (collaborator-declared) | rejected
+    if(a.justification===undefined) a.justification="";
+    if(a.docs===undefined) a.docs=[];             // [{name, mime, data(dataURL)}]
+    if(a.declaredBy===undefined) a.declaredBy=null;
+  });
+  (s.employees||[]).forEach(function(e){
+    if(e.role===undefined) e.role="";              // "" | "tl" | "mgr"
+    if(e.escalated===undefined) e.escalated=false; // leaders only: temporarily assignable
+    if(e.pwHash===undefined) e.pwHash=null;        // null = default password "colab" (must change on first login)
+    if(e.photo===undefined) e.photo=null;          // small JPEG data-URL
+  });
+  (s.requests||[]).forEach(function(r){ if(r.requesterId===undefined) r.requesterId=null; });
+  return s;
+}
+var COLAB_DEFAULT_PW = "colab";
+function isLeader(e){ return e && (e.role==="tl"||e.role==="mgr"); }
+function inBalance(e){ return !isLeader(e); }      // leaders never take part in workload balance
+function schedulable(e){ return !isLeader(e) || e.escalated; }
+function roleTag(e){
+  if(!isLeader(e)) return "";
+  return '<span class="cts-roletag cts-'+e.role+'">'+(e.role==="tl"?"Team Leader":"Manager")+'</span>'
+    +(e.escalated?'<span class="cts-esc">escalated</span>':"");
+}
+function avatar(e,size){
+  if(e && e.photo) return '<img class="cts-ava" '+(size?'style="width:'+size+'px;height:'+size+'px" ':"")+'src="'+e.photo+'" alt="">';
+  var ini=e? e.name.split(" ").map(function(w){return w.charAt(0);}).join("").slice(0,2).toUpperCase() : "?";
+  return '<span class="cts-ava-ph" '+(size?'style="width:'+size+'px;height:'+size+'px" ':"")+'>'+esc(ini)+'</span>';
+}
+function sessionsOn(t, dateIso){
+  if(!t.training || !t.training.sessions) return [];
+  return t.training.sessions.filter(function(s2){ return s2.date===dateIso; });
+}
+function hasSessions(t){ return !!(t.training && t.training.sessions && t.training.sessions.length); }
+function tasksByRank(){
+  return S.tasks.slice().sort(function(a,b){ return (a.rank!=null?a.rank:99)-(b.rank!=null?b.rank:99); });
+}
+/* THE weekend coverage unit: exactly one weekend position is staffed — three
+   collaborators (Early / Mid / Late), the same three on Saturday and Sunday —
+   and that trio covers ALL other positions during the weekend. */
+function primaryWeekendTask(){
+  var byRank=tasksByRank();
+  var t=byRank.find ? byRank.find(function(x){return x.type==="we" && !x.training && !x.optional && x.balance!==false;}) : null;
+  if(!t){ for(var i=0;i<byRank.length;i++){ var x=byRank[i]; if(x.type==="we" && !x.training && !x.optional && x.balance!==false){ t=x; break; } } }
+  if(!t){ for(var j=0;j<byRank.length;j++){ var y=byRank[j]; if(y.type==="we" && !y.training){ t=y; break; } } }
+  return t||null;
+}
+/* signed workload carry: negative = behind (worked less than their fair share —
+   e.g. pulled to training, or a week where balance was unachievable), positive =
+   ahead (absorbed extra load). The scheduler compensates it over the FOLLOWING
+   weeks and months — balance is a goal it strides toward, never a gate that
+   blocks producing the schedule in full. Vacation/absence reduces the fair
+   share, so entitled rest never creates work-debt. */
+function carryOf(id){ return Math.round(((S.carry&&S.carry[id])||0)*10)/10; }
+function carryWeOf(id){ return Math.round(((S.carryWe&&S.carryWe[id])||0)*10)/10; }
+/* fingerprint of the position structure — regeneration is offered when it changes */
+function structHash(){
+  return S.tasks.map(function(t){
+    var sess=(t.training&&t.training.sessions||[]).map(function(s2){
+      return s2.date+"."+s2.trainerId+"."+(s2.traineeIds||[]).join(".");
+    }).sort().join(",");
+    return [t.id,t.type,t.minLevel,t.slots,(t.days||[]).join("."),
+      t.balance===false?0:1,t.rank||0,t.optional?1:0,sess].join(":");
+  }).sort().join("|")+"~R"+RULES().maxConsecutive+"."+RULES().postWeekendCap+"~M"+(S.merges||[]).map(function(m){return m.a+"+"+m.b+(m.replaceTask?">"+m.replaceTask+"="+(m.replaceName||""):"");}).join(",");
+}
+/* map of empId -> {dateIso:1} of every worked day known in stored schedules.
+   excludeWs: skip that week — essential when REgenerating it, otherwise the
+   old copy's dates create phantom streaks that wrongly exclude people. */
+function buildWorkedDates(excludeWs){
+  var worked={};
+  var map=allSchedules();
+  Object.keys(map).forEach(function(ws){
+    if(excludeWs && ws===excludeWs) return;
+    var sc=map[ws];
+    Object.keys(sc.cells).forEach(function(k){
+      var d=+k.split("_")[1];
+      var dateIso=addDays(ws,d);
+      sc.cells[k].forEach(function(a){
+        if(!a.empId) return;
+        worked[a.empId]=worked[a.empId]||{};
+        worked[a.empId][dateIso]=1;
+      });
+    });
+  });
+  return worked;
+}
+function RULES(){ return (S&&S.rules)||{maxConsecutive:6,postWeekendCap:5}; }
+/* WEEKEND-ANCHORED REST POLICY:
+   - Weekend NOT worked -> Saturday and Sunday ARE that week's days off.
+     No weekday rest entitlement: the person can be scheduled all five weekdays.
+   - Weekend WORKED -> the compensation lands in the FOLLOWING week: hard cap
+     of 5 worked days that week, guaranteeing at least 2 days off after the
+     worked weekend (split allowed; an off next-weekend also counts as the
+     compensation).
+   - Universal hard wall either way: never more than 6 workdays in a row,
+     checked across week boundaries over the totality of worked days. */
+function streakOK(worked, empId, dateIso){
+  var w=worked[empId]; if(!w) return true;
+  var run=1, d;
+  d=dateIso; while(w[(d=addDays(d,-1))]) run++;
+  d=dateIso; while(w[(d=addDays(d,1))]) run++;
+  return run<=RULES().maxConsecutive;
+}
+/* did this person work the weekend immediately BEFORE the week containing dateIso? */
+function prevWeekendWorked(worked, empId, weekStartIso){
+  var w=worked[empId]; if(!w) return false;
+  return !!(w[addDays(weekStartIso,-2)] || w[addDays(weekStartIso,-1)]);
+}
+var mem = null;
+function loadLocal(){
+  try{ var raw = localStorage.getItem(LS_KEY); if(raw) return migrate(JSON.parse(raw)); }catch(e){}
+  return mem || defaultState();
+}
+function saveLocal(){ try{ localStorage.setItem(LS_KEY, JSON.stringify(S)); }catch(e){ mem = S; } }
+function save(){ saveLocal(); spQueueSave(); }
+var S = loadLocal();
+var admin = false;
+var colab = null;                // employee id of the signed-in collaborator (session only)
+var activeTab = "board";
+var viewWeek = -1;               // -1 = current schedule, otherwise index into S.archive
+var boardMode = "week";          // "week" | "month"
+var boardBy = "collab";          // week grid orientation: "collab" (rows = people) | "pos" (rows = positions)
+var viewMonth = (function(){ var d=new Date(); return d.getFullYear()+"-"+pad2(d.getMonth()+1); })();
+var chat = [];                   // Ask AI transcript (session only)
+var trStage = {};                // staging for new training sessions (per task, in-memory)
+function pad2(n){ return (n<10?"0":"")+n; }
+/* every schedule we know about, current week overriding an archived copy of the same week */
+function allSchedules(){
+  var out={}, i;
+  for(i=0;i<S.archive.length;i++) out[S.archive[i].weekStart]=S.archive[i];
+  if(S.schedule) out[S.schedule.weekStart]=S.schedule;
+  return out;
+}
+function assignmentsForDate(dateIso){
+  var ws=mondayOf(dateIso), sc=allSchedules()[ws];
+  if(!sc) return null;
+  var d=dayIdxOf(dateIso), res=[];
+  S.tasks.forEach(function(t){
+    var cell=sc.cells[t.id+"_"+d]; if(!cell) return;
+    cell.forEach(function(a){ res.push({task:t, a:a}); });
+  });
+  return res;
+}
+
+/* ---------- helpers ---------- */
+function uid(){ return "id"+Math.random().toString(36).slice(2,9); }
+function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];}); }
+function nextMonday(){ var d=new Date(); var day=(d.getDay()+6)%7; d.setDate(d.getDate()-day); return iso(d); }
+function iso(d){ return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()); }
+function pad(n){ return (n<10?"0":"")+n; }
+function addDays(isoStr,n){ var p=isoStr.split("-"); var d=new Date(+p[0],+p[1]-1,+p[2]); d.setDate(d.getDate()+n); return iso(d); }
+function mondayOf(isoStr){ var p=isoStr.split("-"); var d=new Date(+p[0],+p[1]-1,+p[2]); var day=(d.getDay()+6)%7; d.setDate(d.getDate()-day); return iso(d); }
+function dayIdxOf(isoStr){ var p=isoStr.split("-"); var d=new Date(+p[0],+p[1]-1,+p[2]); return (d.getDay()+6)%7; }
+function fmtShort(isoStr){ var p=isoStr.split("-"); return pad(+p[2])+"/"+pad(+p[1]); }
+function weekDays(){ return (S.includeWeekend || S.tasks.some(function(t){return t.type==="we";})) ? 7 : 5; }
+function skillOf(emp, taskId){ return emp.skills[taskId]||1; }
+function pips(lvl){
+  var s=""; for(var i=1;i<=4;i++){ s += i<=lvl ? "\u25AE" : '<span class="cts-off">\u25AF</span>'; }
+  return '<span class="cts-pips" title="Level '+lvl+'/4'+(lvl===1?" \u2014 cannot do this task":"")+'">'+s+"</span>";
+}
+function empById(id){ for(var i=0;i<S.employees.length;i++) if(S.employees[i].id===id) return S.employees[i]; return null; }
+function empByName(n){ n=String(n||"").trim().toLowerCase(); for(var i=0;i<S.employees.length;i++) if(S.employees[i].name.toLowerCase()===n) return S.employees[i]; return null; }
+function taskById(id){ for(var i=0;i<S.tasks.length;i++) if(S.tasks[i].id===id) return S.tasks[i]; return null; }
+function taskByName(n){ n=String(n||"").trim().toLowerCase(); for(var i=0;i<S.tasks.length;i++) if(S.tasks[i].name.toLowerCase()===n) return S.tasks[i]; return null; }
+function shiftLabel(k){ for(var i=0;i<SHIFTS.length;i++) if(SHIFTS[i].k===k) return SHIFTS[i].label; return ""; }
+function isAbsent(empId, dateIso){
+  for(var i=0;i<S.absences.length;i++){ var a=S.absences[i];
+    if(a.status==="rejected") continue;
+    if(a.empId===empId && dateIso>=a.from && dateIso<=a.to) return a.type; }
+  return null;
+}
+function hist(empId, taskId){ return (S.history[empId]&&S.history[empId][taskId])||0; }
+function bumpHist(empId, taskId, n){
+  S.history[empId]=S.history[empId]||{};
+  S.history[empId][taskId]=Math.max(0,(S.history[empId][taskId]||0)+n);
+}
+function toast(msg){
+  var t=document.createElement("div"); t.className="cts-toast"; t.textContent=msg;
+  document.body.appendChild(t); setTimeout(function(){ t.parentNode&&t.parentNode.removeChild(t); },2600);
+}
+function sha256(str){
+  try{
+    if(window.crypto && crypto.subtle && window.TextEncoder){
+      return crypto.subtle.digest("SHA-256", new TextEncoder().encode(str)).then(function(buf){
+        return Array.prototype.map.call(new Uint8Array(buf),function(b){return ("0"+b.toString(16)).slice(-2);}).join("");
+      });
+    }
+  }catch(e){}
+  var h=5381; for(var i=0;i<str.length;i++){ h=((h<<5)+h+str.charCodeAt(i))|0; } // fallback only
+  return Promise.resolve("f"+(h>>>0).toString(16));
+}
+
+/* ---------- SharePoint List persistence (shared) ---------- */
+/* ================= PRODUCTION CONFIGURATION =================
+   CTS_VERSION      shown for support/debugging.
+   SP_LIST          must match the provisioned list title
+                    (see rotation-board-sharepoint-deployment.md).
+   SP_FIELD         the multiline text column holding the state.
+   SP_URL_OVERRIDE  full site URL, or "" to auto-detect from the
+                    SharePoint page context.
+   ============================================================ */
+var CTS_VERSION="PROD-1.0 (engine v31)";
+var SP_LIST="RotationBoardData", SP_FIELD="CtsData";
+var SP_URL_OVERRIDE="";  // e.g. "https://tenant.sharepoint.com/sites/YourSite" — leave "" to auto-detect
+var spWeb = SP_URL_OVERRIDE || (typeof _spPageContextInfo!=="undefined" && _spPageContextInfo.webAbsoluteUrl) || null;
+var spUser = (typeof _spPageContextInfo!=="undefined" && _spPageContextInfo.userDisplayName) || "unknown";
+var spItemId=null, spTimer=null, spBusy=false, spDirty=false;
+function syncBadge(cls,txt,title){ var el=document.getElementById("cts-sync"); if(!el)return;
+  el.className="cts-sync "+(cls||""); el.textContent=txt; el.title=title||txt; }
+function spFetch(path,opts,digest){
+  opts=opts||{}; opts.headers=opts.headers||{};
+  opts.headers["Accept"]="application/json;odata=nometadata"; opts.credentials="same-origin";
+  if(opts.body) opts.headers["Content-Type"]="application/json;odata=nometadata";
+  if(digest) opts.headers["X-RequestDigest"]=digest;
+  return fetch(spWeb+path,opts);
+}
+function spDigest(){ return spFetch("/_api/contextinfo",{method:"POST"}).then(function(r){
+  if(!r.ok) throw new Error("digest "+r.status); return r.json(); }).then(function(j){ return j.FormDigestValue; }); }
+function spEnsureList(digest){
+  return spFetch("/_api/web/lists/getbytitle('"+SP_LIST+"')?$select=Title").then(function(r){
+    if(r.ok) return true;
+    if(r.status!==404) throw new Error("list check "+r.status);
+    return spFetch("/_api/web/lists",{method:"POST",body:JSON.stringify(
+      {Title:SP_LIST,BaseTemplate:100,Description:"Rotation Board shared data (JSON blob) - do not edit manually."})},digest)
+    .then(function(r2){ if(!r2.ok) throw new Error("list create "+r2.status);
+      return spFetch("/_api/web/lists/getbytitle('"+SP_LIST+"')/fields",{method:"POST",
+        body:JSON.stringify({Title:SP_FIELD,FieldTypeKind:3})},digest); })
+    .then(function(r3){ if(!r3.ok) throw new Error("field create "+r3.status); return true; });
+  });
+}
+function itemBody(){
+  var payload={savedBy:spUser,savedAt:new Date().toISOString()};
+  ["weekStart","includeWeekend","trainingRate","adminHash","employees","tasks","absences","history","requests","archive","schedule"]
+    .forEach(function(k){ payload[k]=S[k]; });
+  var b={}; b[SP_FIELD]=JSON.stringify(payload); b.Title="state"; return b;
+}
+function stamp(){ return "Saved by "+spUser+" \u00B7 "+new Date().toLocaleTimeString(); }
+function spLoad(){
+  if(!spWeb){ syncBadge("","local only","Not inside SharePoint — using this browser's storage."); return; }
+  syncBadge("cts-sync-busy","loading\u2026");
+  spDigest().then(function(digest){ return spEnsureList(digest).then(function(){ return digest; }); })
+  .then(function(digest){
+    return spFetch("/_api/web/lists/getbytitle('"+SP_LIST+"')/items?$top=1&$select=Id,"+SP_FIELD)
+    .then(function(r){ if(!r.ok) throw new Error("items "+r.status); return r.json(); })
+    .then(function(j){
+      var items=j.value||[];
+      if(items.length){
+        spItemId=items[0].Id;
+        if(items[0][SP_FIELD]){
+          try{ var remote=JSON.parse(items[0][SP_FIELD]);
+            if(remote && remote.employees && remote.tasks){ S=migrate(remote); saveLocal(); render(); }
+          }catch(e){}
+        }
+        syncBadge("cts-sync-ok","shared \u00B7 synced",stamp());
+      } else {
+        return spFetch("/_api/web/lists/getbytitle('"+SP_LIST+"')/items",{method:"POST",body:JSON.stringify(itemBody())},digest)
+        .then(function(r2){ if(!r2.ok) throw new Error("seed "+r2.status); return r2.json(); })
+        .then(function(j2){ spItemId=j2.Id; syncBadge("cts-sync-ok","shared \u00B7 synced",stamp()); });
+      }
+    });
+  }).catch(function(e){
+    syncBadge("cts-sync-err","sync error","Shared storage unavailable ("+e.message+"). Working locally; changes stay on this browser until sync recovers.");
+  });
+}
+function spQueueSave(){
+  if(!spWeb) return;
+  spDirty=true; syncBadge("cts-sync-busy","saving\u2026");
+  clearTimeout(spTimer); spTimer=setTimeout(spPush,1200);
+}
+function spPush(){
+  if(spBusy){ spTimer=setTimeout(spPush,800); return; }
+  if(!spDirty) return;
+  spBusy=true; spDirty=false;
+  spDigest().then(function(digest){
+    var path="/_api/web/lists/getbytitle('"+SP_LIST+"')/items"+(spItemId?"("+spItemId+")":"");
+    var opts={method:"POST",body:JSON.stringify(itemBody())};
+    if(spItemId) opts.headers={"IF-MATCH":"*","X-HTTP-Method":"MERGE"};
+    return spFetch(path,opts,digest).then(function(r){
+      if(!r.ok) throw new Error("save "+r.status);
+      if(!spItemId && r.status===201) return r.json().then(function(j){ spItemId=j.Id; });
+    });
+  }).then(function(){
+    spBusy=false;
+    if(spDirty){ spPush(); return; }
+    syncBadge("cts-sync-ok","shared \u00B7 synced",stamp());
+  }).catch(function(e){
+    spBusy=false; spDirty=true;
+    syncBadge("cts-sync-err","sync error","Save failed ("+e.message+"). Changes kept locally; will retry on next edit.");
+  });
+}
+
+/* ---------- password gate ---------- */
+function tryUnlockAdmin(){
+  var pw = prompt("Admin password:");
+  if(pw===null) return;
+  sha256(pw).then(function(h){
+    var ok = S.adminHash ? (h===S.adminHash) : (pw===DEFAULT_PW);
+    if(ok){
+      admin=true;
+      document.getElementById("cts-adminToggle").classList.add("cts-on");
+      if(!S.adminHash) toast("Admin unlocked \u2014 default password in use, change it in the Data tab");
+      else toast("Admin unlocked");
+      render();
+    } else { toast("Wrong password"); }
+  });
+}
+function lockAdmin(){
+  admin=false;
+  document.getElementById("cts-adminToggle").classList.remove("cts-on");
+  render();
+}
+
+/* ---------- collaborator sign-in (per-person requests) ---------- */
+function renderColabSlot(){
+  var slot=document.getElementById("cts-colabslot"); if(!slot) return;
+  var e=colab?empById(colab):null;
+  if(e){
+    slot.innerHTML='<span class="cts-me">'+avatar(e,22)+' '+esc(e.name.split(" ")[0])
+      +' <button class="cts-btn cts-btn-sm" id="cts-mypw" title="Change my password">pw</button>'
+      +' <button class="cts-btn cts-btn-sm" id="cts-signout">out</button></span>';
+    document.getElementById("cts-mypw").addEventListener("click",function(){ colabChangePw(e); });
+    document.getElementById("cts-signout").addEventListener("click",function(){ colab=null; renderColabSlot(); render(); });
+  } else {
+    slot.innerHTML='<button class="cts-btn cts-btn-sm" id="cts-signin">Collaborator sign-in</button>';
+    document.getElementById("cts-signin").addEventListener("click",colabSignIn);
+  }
+}
+function colabChangePw(e, thenFn){
+  var p1=prompt("New password for "+e.name+" (min 4 characters):");
+  if(p1===null) return;
+  if(p1.length<4){ toast("Too short \u2014 minimum 4 characters"); return; }
+  var p2=prompt("Repeat the new password:");
+  if(p2!==p1){ toast("Passwords do not match"); return; }
+  sha256(p1).then(function(hh){
+    e.pwHash=hh; save();
+    toast("Password updated");
+    if(thenFn) thenFn();
+  });
+}
+function colabSignIn(){
+  var n=prompt("Your name (exactly as in Team & skills):");
+  if(n===null) return;
+  var e=empByName(n);
+  if(!e){ toast("No collaborator with that name"); return; }
+  var pw=prompt("Password:");
+  if(pw===null) return;
+  if(!e.pwHash){
+    // first login: default password, change is mandatory
+    if(pw!==COLAB_DEFAULT_PW){ toast("Wrong password"); return; }
+    toast("Default password accepted \u2014 you must set your own now");
+    colabChangePw(e,function(){ colab=e.id; renderColabSlot(); render(); });
+    return;
+  }
+  sha256(pw).then(function(hh){
+    if(hh===e.pwHash){ colab=e.id; renderColabSlot(); render(); toast("Signed in as "+e.name); }
+    else toast("Wrong password");
+  });
+}
+
+/* ---------- scheduling engine ---------- */
+function slotListForDay(d, optionalFlag){
+  // Weekday positions: `slots` identical assignments; filtered by the CORE /
+  // SUGGEST split (optionalFlag). Weekend positions are paired elsewhere;
+  // TRAINING positions are filled from their per-day sessions.
+  var out=[];
+  S.tasks.forEach(function(t){
+    if(t.training) return;
+    if(t.type==="we") return;
+    if(d===5||d===6) return;              // weekends belong to the trio: it covers ALL other positions
+    if(!!t.optional!==!!optionalFlag) return;
+    if(t.days.indexOf(d)===-1) return;
+    for(var s=0;s<t.slots;s++) out.push({task:t, shift:null});
+  });
+  return out;
+}
+function generateWeek(weekStartIso, ctx){
+  ctx=ctx||{};
+  var worked = ctx.worked || buildWorkedDates(weekStartIso);
+  var noLedger = !!ctx.noLedger;
+  var nDays=weekDays(), cells={}, gaps=[], redist=[], mergesLog=[];
+  var counts={}, weCounts={}, extraCounts={}, daysWorked={};
+  S.employees.forEach(function(e){ counts[e.id]=0; weCounts[e.id]=0; extraCounts[e.id]=0; daysWorked[e.id]=0; });
+  S.carry=S.carry||{}; S.carryWe=S.carryWe||{}; S.recup=S.recup||{};
+  var assignedByDay={};                          // day -> {empId:true}
+
+  function markWork(empId, d, dateIso){
+    if(!assignedByDay[d][empId]){
+      assignedByDay[d][empId]=true;
+      daysWorked[empId]++;
+      worked[empId]=worked[empId]||{};
+      worked[empId][dateIso]=1;
+    }
+  }
+  function canWork(e, d, dateIso){
+    if(isAbsent(e.id,dateIso) || assignedByDay[d][e.id]) return false;
+    if(!streakOK(worked, e.id, dateIso)) return false;
+    // compensation cap: worked last weekend -> at most 5 days THIS week,
+    // guaranteeing 2 days off after the worked weekend. Weekend off last
+    // week -> Sat+Sun WERE the days off; all five weekdays are workable.
+    if(prevWeekendWorked(worked, e.id, weekStartIso) && daysWorked[e.id]>=RULES().postWeekendCap) return false;
+    return true;
+  }
+
+  // weekends are staffed FIRST so this week's weekend picks are settled
+  // before the weekday load is distributed
+  var dayOrder = nDays===7 ? [5,6,0,1,2,3,4] : [0,1,2,3,4];
+  dayOrder.forEach(function(d){ assignedByDay[d]={}; });
+  var taskWeek={};                               // taskId -> empId -> assignments this week
+  function twGet(tid,eid){ return (taskWeek[tid]&&taskWeek[tid][eid])||0; }
+  function twBump(tid,eid,delta){ taskWeek[tid]=taskWeek[tid]||{}; taskWeek[tid][eid]=(taskWeek[tid][eid]||0)+(delta||1); }
+
+  /* CASCADE REDISTRIBUTION: when nobody FREE can staff a core position, look
+     for a collaborator already assigned that day to another position who CAN
+     do it, and whose own position can be taken over by someone free. The
+     capable person moves up; the free collaborator fills the vacated spot. */
+  function tryRedistribute(t, d, dateIso, shift, allowDev){
+    if(d>4) return false;                               // weekends belong to the trio
+    var freeF=S.employees.filter(function(e){
+      return !isLeader(e) && schedulable(e) && canWork(e,d,dateIso); });
+    if(!freeF.length) return false;
+    var passes = allowDev ? [false,true] : [false];
+    for(var pi=0; pi<passes.length; pi++){
+      var devPass=passes[pi];
+      var keys=Object.keys(cells);
+      for(var ki=0; ki<keys.length; ki++){
+        var k=keys[ki], p=k.split("_");
+        if(+p[1]!==d) continue;
+        var tc=taskById(p[0]);
+        if(!tc || tc.id===t.id || tc.training) continue;
+        var arr=cells[k];
+        for(var ci=0; ci<arr.length; ci++){
+          var a=arr[ci];
+          if(!a.empId || a.role || a.training) continue;  // never break training or development pairs
+          var c=empById(a.empId);
+          if(!c || isLeader(c)) continue;
+          var lv=skillOf(c,t.id);
+          if(devPass ? !(lv>=2 && lv===t.minLevel-1) : lv<t.minLevel) continue;
+          var takers=freeF.filter(function(f){ return skillOf(f,tc.id)>=tc.minLevel; });
+          if(!takers.length) continue;
+          var f=pickBest(tc, takers);
+          var oldShift=a.shift||null;
+          // 1) vacate: pull c off tc, rewind its counters
+          arr.splice(ci,1);
+          if(tc.balance===false){ extraCounts[c.id]--; } else { counts[c.id]--; }
+          twBump(tc.id,c.id,-1); bumpHist(c.id,tc.id,-1);
+          // 2) the capable (or development-level) person takes the hard position
+          commit(c, t, d, dateIso, shift, devPass);
+          // 3) the free collaborator fills the vacated one
+          commit(f, tc, d, dateIso, oldShift, false);
+          redist.push({day:d, moved:c.name, from:tc.name, to:t.name, freed:f.name, dev:devPass||undefined});
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  /* generic single-slot assignment — shared by weekday slots and the
+     per-day fallback of the weekend pairing */
+  function assignOne(t, d, dateIso, shift, optionalFlag){
+    var key=t.id+"_"+d;
+    var free=S.employees.filter(function(e){
+      if(isLeader(e) && t.noEscalation) return false;
+      if(isLeader(e) && t.optional) return false;         // leadership is never pulled for a mere suggestion
+      return schedulable(e) && canWork(e,d,dateIso); });
+    var qualified=free.filter(function(e){ return skillOf(e,t.id)>=t.minLevel; });
+    var trainees=free.filter(function(e){ var l=skillOf(e,t.id); return !isLeader(e) && l>=2 && l===t.minLevel-1; });
+    var hasQualifiedHere=(cells[key]||[]).some(function(a){
+      var em=empById(a.empId); return em && skillOf(em,t.id)>=t.minLevel; });
+
+    var pool=qualified.slice(), trainingPick=false;
+    if(qualified.length===0 && !t.optional){
+      // FIRST choice when nobody free is qualified: redistribute — a capable
+      // colleague assigned elsewhere moves here, a free collaborator backfills.
+      // Only if no such cascade exists do we degrade to a development fill.
+      if(tryRedistribute(t, d, dateIso, shift)){
+        var placed=(cells[key]&&cells[key][cells[key].length-1])||null;
+        return placed ? empById(placed.empId) : null;
+      }
+    }
+    if(qualified.length===0 && trainees.length>0){ pool=trainees.slice(); trainingPick=true; }
+    else if(trainees.length>0 && hasQualifiedHere && Math.random()<S.trainingRate){ pool=pool.concat(trainees); }
+
+    if(pool.length===0){
+      if(t.optional){
+        gaps.push({task:t.name, day:d, shift:shift, optional:true, reason:"not suggested \u2014 no spare staff"});
+        cells[key]=cells[key]||[]; cells[key].push({empId:null, shift:shift, optional:true});
+        return null;
+      }
+      // nobody free can do it -> redistribute: a capable busy colleague moves
+      // here and a free collaborator takes over their position
+      if(tryRedistribute(t, d, dateIso, shift, true)) return empById((cells[key][cells[key].length-1]||{}).empId)||null;
+      gaps.push({task:t.name, day:d, shift:shift,
+        reason: t.noEscalation ? "left unfilled by design (no mandatory escalation)"
+                               : "no eligible staff (skills / absences / rest rules)"});
+      cells[key]=cells[key]||[]; cells[key].push({empId:null, shift:shift});
+      return null;
+    }
+    var best=pickBest(t, pool);
+    commit(best, t, d, dateIso, shift, trainingPick);
+    return best;
+  }
+  /* capable-group scoring (see v8 notes) */
+  function pickBest(t, pool){
+    var onBalance = t.balance!==false;
+    var wc = !onBalance ? extraCounts : (t.type==="we" ? weCounts : counts);
+    var minC=Infinity, minTW=Infinity, minLead=Infinity;
+    pool.forEach(function(e){
+      if(inBalance(e)){
+        if(wc[e.id]<minC) minC=wc[e.id];
+        if(twGet(t.id,e.id)<minTW) minTW=twGet(t.id,e.id);
+      } else if(wc[e.id]<minLead) minLead=wc[e.id];
+    });
+    if(minC===Infinity) minC=0;
+    if(minTW===Infinity) minTW=0;
+    if(minLead===Infinity) minLead=0;
+    var best=null,bestScore=-Infinity;
+    pool.forEach(function(e){
+      var lvl=skillOf(e,t.id), score;
+      if(isLeader(e)){
+        score = -6 + (minLead-wc[e.id])*1 - twGet(t.id,e.id)*1.5 + Math.random()*0.5;
+      } else {
+        score=(minC-wc[e.id])*5
+          + (minTW-twGet(t.id,e.id))*2.2
+          + 2/(1+hist(e.id,t.id))
+          + (lvl<4 ? S.trainingRate*1.5*(4-lvl) : 0)
+          /* STRICT SEPARATION: weekday positions are balanced only against the
+             weekday ledger, weekend positions only against the weekend ledger.
+             No term ever reads the other side's balance. */
+          + (onBalance ? Math.max(-4, Math.min(10, -((t.type==="we"?S.carryWe:S.carry)[e.id]||0)))*2.8 : 0)
+          - (t.type!=="we" ? Math.min((S.recup[e.id]||0),2)*2.5 : 0)   // owed recuperation: rest, not balance
+          + Math.random()*0.5;
+      }
+      if(score>bestScore){ bestScore=score; best=e; }
+    });
+    return best;
+  }
+  var weekendMark={};                            // empId -> already counted for THIS weekend
+  function commit(e, t, d, dateIso, shift, trainingPick){
+    var onBalance = t.balance!==false;
+    var isTraining=trainingPick || skillOf(e,t.id)<t.minLevel;
+    if(onBalance){
+      if(d===5||d===6){
+        // weekend metric = WEEKENDS worked, not shift-days: one unit per person
+        // per weekend, regardless of position type or how many days they take
+        if(!weekendMark[e.id]){ weekendMark[e.id]=true; weCounts[e.id]++; }
+        if(t.type!=="we") counts[e.id]++;        // weekday-type task on a weekend still carries weekday workload
+      } else {
+        counts[e.id]++;
+      }
+    } else {
+      extraCounts[e.id]++;
+    }
+    twBump(t.id,e.id);
+    markWork(e.id,d,dateIso);
+    bumpHist(e.id,t.id,1);
+    var key=t.id+"_"+d;
+    cells[key]=cells[key]||[]; cells[key].push({empId:e.id, training:isTraining, shift:shift, esc:isLeader(e)||undefined});
+  }
+
+  // --- pre-pass 1: training SESSIONS on their exact calendar day (participants locked) ---
+  dayOrder.forEach(function(d){
+    var dateIso=addDays(weekStartIso,d);
+    S.tasks.forEach(function(t){
+      if(!t.training) return;
+      var sess=sessionsOn(t,dateIso);
+      if(!sess.length) return;
+      var key=t.id+"_"+d; cells[key]=cells[key]||[];
+      var seen={};
+      sess.forEach(function(s2){
+        var ids=[]; if(s2.trainerId) ids.push(s2.trainerId);
+        (s2.traineeIds||[]).forEach(function(id){ if(ids.indexOf(id)===-1) ids.push(id); });
+        ids.forEach(function(pid){
+          if(seen[pid]) return; seen[pid]=true;
+          var e=empById(pid); if(!e) return;
+          if(isAbsent(pid,dateIso)) return;
+          var role = (pid===s2.trainerId) ? "trainer" : "trainee";
+          cells[key].push({empId:pid, role:role});
+          markWork(pid,d,dateIso);
+          bumpHist(pid,t.id,1);
+        });
+      });
+      if(!cells[key].length){ gaps.push({task:t.name, day:d, shift:null, reason:"session participants absent"}); cells[key].push({empId:null}); }
+    });
+  });
+
+  // --- WEEKEND PAIRING — one person per shift for the WHOLE weekend ---
+  // Early, Late and Mid are each held by a single collaborator on both Saturday
+  // and Sunday; per-day split only when nobody can cover both days.
+  function pairWeekend(taskList){
+    if(nDays!==7) return;
+    var satIso=addDays(weekStartIso,5), sunIso=addDays(weekStartIso,6);
+    taskList.forEach(function(t){
+      SHIFTS.forEach(function(sh){
+        var pool2=S.employees.filter(function(e){
+          if(isLeader(e) && t.noEscalation) return false;
+          if(!schedulable(e)) return false;
+          if(skillOf(e,t.id)<t.minLevel) return false;
+          if(!canWork(e,5,satIso)) return false;
+          if(isAbsent(e.id,sunIso) || assignedByDay[6][e.id]) return false;
+          worked[e.id]=worked[e.id]||{};
+          var had=worked[e.id][satIso]; worked[e.id][satIso]=1;
+          var ok=streakOK(worked,e.id,sunIso);
+          if(!had) delete worked[e.id][satIso];
+          return ok;
+        });
+        if(pool2.length){
+          var best=pickBest(t,pool2);
+          commit(best,t,5,satIso,sh.k,false);
+          commit(best,t,6,sunIso,sh.k,false);
+        } else if(!t.optional){
+          assignOne(t,5,satIso,sh.k);
+          assignOne(t,6,sunIso,sh.k);
+        } else {
+          // a SUGGEST position never degrades staffing: skipped cleanly
+          [5,6].forEach(function(dd){
+            gaps.push({task:t.name, day:dd, shift:sh.k, optional:true, reason:"not suggested \u2014 no spare staff"});
+            var kk=t.id+"_"+dd; cells[kk]=cells[kk]||[]; cells[kk].push({empId:null, shift:sh.k, optional:true});
+          });
+        }
+      });
+    });
+  }
+  function weekdayPass(optionalFlag){
+    dayOrder.forEach(function(d){
+      var dateIso=addDays(weekStartIso,d);
+      var slots=slotListForDay(d, optionalFlag);
+      slots.forEach(function(sl){
+        sl.eligible=S.employees.filter(function(e){
+          return schedulable(e) && canWork(e,d,dateIso) && skillOf(e,sl.task.id)>=sl.task.minLevel; }).length;
+      });
+      // ALWAYS THE PRIORITY: strict rank order first, most-constrained inside a rank
+      slots.sort(function(a,b){
+        var r=(a.task.rank!=null?a.task.rank:99)-(b.task.rank!=null?b.task.rank:99);
+        return r!==0 ? r : a.eligible-b.eligible;
+      });
+      slots.forEach(function(sl){ assignOne(sl.task,d,dateIso,sl.shift,optionalFlag); });
+    });
+  }
+
+  // --- WEEKEND: one coverage unit of exactly three collaborators ---
+  var pwt=primaryWeekendTask();
+  pairWeekend(pwt?[pwt]:[]);
+  if(nDays===7 && pwt){
+    var satHas=(cells[pwt.id+"_5"]||[]).some(function(a){return a.empId;});
+    var sunHas=(cells[pwt.id+"_6"]||[]).some(function(a){return a.empId;});
+    var weGapExists=gaps.some(function(g){return g.task===pwt.name;});
+    if((!satHas||!sunHas) && !weGapExists){
+      [5,6].forEach(function(dw){
+        gaps.push({task:pwt.name, day:dw, shift:null, reason:"weekend trio could not be staffed (skills / absences / rest rules)"});
+        var kw=pwt.id+"_"+dw; cells[kw]=cells[kw]||[]; if(!cells[kw].length) cells[kw].push({empId:null});
+      });
+    }
+  }
+  // --- CORE PHASE: ranked weekday positions filled first, always ---
+  weekdayPass(false);
+  // --- SUGGEST PHASE: optional weekday positions with leftover people only ---
+  weekdayPass(true);
+
+  /* MERGE PASS: for still-unfilled CORE weekday slots, apply the admin-defined
+     merge rules IN ORDER: if the paired position is staffed that day by someone
+     qualified for the unfilled one, that person covers BOTH (one desk, merged).
+     One merge per person per day; training and development pairs untouched. */
+  function mergePass(){
+    var mergedBy={};
+    (S.merges||[]).forEach(function(rule){
+      [[rule.a,rule.b],[rule.b,rule.a]].forEach(function(pair){
+        var tSrc=taskById(pair[0]), tDst=taskById(pair[1]);
+        if(!tSrc||!tDst||tSrc.training||tDst.training||tDst.optional) return;
+        for(var d=0; d<Math.min(5,nDays); d++){
+          var arrD=cells[tDst.id+"_"+d]||[];
+          for(var i=0;i<arrD.length;i++){
+            var slot=arrD[i];
+            if(slot.empId) continue;
+            if(slot.optional) continue;
+            var arrS=cells[tSrc.id+"_"+d]||[];
+            for(var j=0;j<arrS.length;j++){
+              var a=arrS[j];
+              if(!a.empId||a.role||a.training||a.mergedFrom) continue;
+              if(mergedBy[a.empId+"_"+d]) continue;
+              var e=empById(a.empId);
+              if(!e||isLeader(e)) continue;
+              if(skillOf(e,tDst.id)<tDst.minLevel) continue;
+              arrD[i]={empId:e.id, shift:slot.shift||null, mergedFrom:tSrc.id};
+              a.mergedWith=tDst.id;                       // both sides now render as ONE position "A+B"
+              mergedBy[e.id+"_"+d]=true;
+              bumpHist(e.id,tDst.id,1);
+              // task redistribution: the merge transforms ANOTHER position that
+              // day — it runs under a new admin-defined name, same staffing,
+              // and keeps counting toward the ORIGINAL position's balance.
+              var transformed=null;
+              if(rule.replaceTask && rule.replaceName){
+                var arrR=cells[rule.replaceTask+"_"+d]||[];
+                for(var ri=0;ri<arrR.length;ri++){
+                  if(arrR[ri].empId && !arrR[ri].role){ arrR[ri].transformedName=rule.replaceName; transformed=true; }
+                }
+                var tR=taskById(rule.replaceTask);
+                if(transformed && tR) transformed=tR.name;
+              }
+              mergesLog.push({day:d, task:tDst.name, withTask:tSrc.name, emp:e.name,
+                replaced:transformed||undefined, as:(transformed&&rule.replaceName)||undefined});
+              for(var g=gaps.length-1;g>=0;g--){
+                var gg=gaps[g];
+                if(gg.task===tDst.name && gg.day===d && (gg.shift||null)===(slot.shift||null) && !gg.optional){ gaps.splice(g,1); break; }
+              }
+              break;
+            }
+          }
+        }
+      });
+    });
+  }
+  mergePass();
+
+
+  // --- carry-over ledger: signed imbalance compensated in the weeks/months to come.
+  // Fair share is proportional to AVAILABILITY: a person on vacation owes nothing
+  // for the days they were entitled to be away; a person present but under-used
+  // (training, or a week where balance was simply not achievable) goes "behind"
+  // and is pulled forward in future generations. Balance never blocks production.
+  if(!noLedger){
+    var balEmp=S.employees.filter(inBalance);
+    function updateCarry(cnt, ledger, availFn){
+      var totalC=0, sumAvail=0, av={};
+      balEmp.forEach(function(e){ totalC+=cnt[e.id]||0; av[e.id]=availFn(e); sumAvail+=av[e.id]; });
+      if(totalC===0 || sumAvail===0) return;
+      balEmp.forEach(function(e){
+        var share=totalC*av[e.id]/sumAvail;
+        var v=(ledger[e.id]||0)+(cnt[e.id]||0)-share;
+        ledger[e.id]=Math.max(-15, Math.min(15, Math.round(v*10)/10));
+      });
+    }
+    function availDays(e){
+      var n=0; for(var dd=0;dd<nDays;dd++){ if(!isAbsent(e.id,addDays(weekStartIso,dd))) n++; }
+      return n;
+    }
+    function availWeekend(e){
+      if(nDays<7) return 0;
+      return (!isAbsent(e.id,addDays(weekStartIso,5)) || !isAbsent(e.id,addDays(weekStartIso,6))) ? 1 : 0;
+    }
+    updateCarry(counts, S.carry, availDays);          // weekday ledger: WORKLOAD units
+    updateCarry(weCounts, S.carryWe, availWeekend);   // weekend ledger: WEEKENDS per person
+    // recuperation ledger: chronological — early off-days consume what last
+    // weekend accrued; this week's worked weekend days add new owed rest.
+    // Split days off and next-week placement are both fine; the hard walls
+    // (6-in-a-row, 10-in-any-14) are enforced at assignment time.
+    S.employees.forEach(function(e){
+      if(isLeader(e)) return;
+      var r=S.recup[e.id]||0;
+      for(var dd=0; dd<nDays; dd++){
+        var workedDay=!!assignedByDay[dd][e.id];
+        if(!workedDay && r>0) r--;
+        if((dd===5||dd===6) && workedDay) r++;
+      }
+      S.recup[e.id]=Math.min(4,r);
+    });
+  }
+
+  return {cells:cells,gaps:gaps,redist:redist,merges:mergesLog,weekStart:weekStartIso,days:nDays,
+    counts:counts,weCounts:weCounts,extraCounts:extraCounts,
+    structHash:structHash(),generatedAt:new Date().toISOString()};
+}
+function coreGaps(sc){ return (sc.gaps||[]).filter(function(g){return !g.optional;}); }
+function optGaps(sc){ return (sc.gaps||[]).filter(function(g){return g.optional;}); }
+function insufficiencyMsg(sc){
+  var core=coreGaps(sc);
+  if(!core.length) return null;
+  return "WORKFORCE INSUFFICIENT \u2014 "+core.length+" PRIORITY slot(s) could not be staffed under the HARD rules "
+    +"(skills, absences, max "+RULES().maxConsecutive+" consecutive days, "+RULES().postWeekendCap+"-day cap in the week after a worked weekend). "
+    +"Balance never blocks generation \u2014 imbalances are carried and compensated in the coming weeks.";
+}
+function generate(){
+  var target=S.weekStart;
+  if(allSchedules()[target] && (!S.schedule || S.schedule.weekStart!==target)){
+    toast("Week "+fmtShort(target)+" is already generated \u2014 open it in the week selector"); return;
+  }
+  if(S.schedule && S.schedule.weekStart!==target) archivePush(S.schedule,"generated");
+  var sc=generateWeek(target);
+  S.schedule=sc;
+  viewWeek=-1;
+  save(); render();
+  var msg=insufficiencyMsg(sc);
+  toast(msg || "Schedule generated");
+}
+function generateNextMonths(){
+  var N_WEEKS=13;                                   // ~3 months
+  var existing=allSchedules();
+  var targets=[]; for(var i=0;i<N_WEEKS;i++) targets.push(addDays(S.weekStart,7*i));
+  var replacingCurrent = S.schedule && S.schedule.weekStart===targets[0];
+  var clash=targets.filter(function(ws){
+    if(replacingCurrent && ws===targets[0]) return false;   // the active week may be replaced
+    return !!existing[ws];
+  });
+  if(clash.length){
+    var lastGen=Object.keys(existing).sort().pop();
+    toast("Blocked \u2014 "+clash.length+" of those weeks already exist (generated through "+lastGen+"). Regeneration is locked.");
+    return;
+  }
+  if(S.schedule){
+    if(replacingCurrent) S.schedule=null;           // discard the outdated copy — never feed it to the streak check
+    else archivePush(S.schedule,"generated");
+  }
+  var worked=buildWorkedDates(targets[0]);          // streaks respected across week boundaries, own week excluded
+  var totalGaps=0, first=null;
+  targets.forEach(function(ws,ix){
+    var sc=generateWeek(ws,{worked:worked});
+    totalGaps+=coreGaps(sc).length;
+    if(ix===0) first=sc; else archivePush(sc,"generated");
+  });
+  S.schedule=first;
+  viewWeek=-1;
+  save(); render();
+  toast(totalGaps? "WORKFORCE INSUFFICIENT \u2014 3 months generated with "+totalGaps+" unstaffable slot(s). Review the red UNFILLED cells."
+                 : "3 months generated ("+N_WEEKS+" weeks, fully staffed). Weeks are locked against regeneration.");
+}
+/* structure changed after generation: rebuild current + future weeks, keep the past intact */
+function regenerateStructure(){
+  var cur=S.schedule; if(!cur){ toast("Nothing to adapt \u2014 no schedule yet"); return; }
+  var fromWs=cur.weekStart;
+  var futureWs=S.archive.filter(function(a){ return a.weekStart>fromWs; })
+    .map(function(a){ return a.weekStart; }).sort();
+  // drop the outdated future copies, keep strictly-past weeks for streak history
+  S.archive=S.archive.filter(function(a){ return a.weekStart<fromWs; });
+  S.schedule=null;
+  var worked=buildWorkedDates(fromWs);
+  var totalGaps=0;
+  var sc=generateWeek(fromWs,{worked:worked,noLedger:true});
+  totalGaps+=coreGaps(sc).length;
+  S.schedule=sc;
+  futureWs.forEach(function(ws){
+    var s2=generateWeek(ws,{worked:worked,noLedger:true});
+    totalGaps+=coreGaps(s2).length;
+    archivePush(s2,"generated");
+  });
+  viewWeek=-1;
+  save(); render();
+  toast(totalGaps? "Adapted to the new structure \u2014 WORKFORCE INSUFFICIENT for "+totalGaps+" slot(s)."
+                 : "Schedules adapted to the new position structure ("+(1+futureWs.length)+" week(s) regenerated).");
+}
+function advanceWeek(){
+  var nextWs=addDays(S.schedule?S.schedule.weekStart:S.weekStart,7);
+  var ix=-1;
+  for(var i=0;i<S.archive.length;i++) if(S.archive[i].weekStart===nextWs){ ix=i; break; }
+  if(ix===-1){ toast("No generated schedule found for week "+fmtShort(nextWs)); return; }
+  if(S.schedule) archivePush(S.schedule,"generated");
+  var nx=S.archive.splice( S.archive.findIndex(function(a){return a.weekStart===nextWs;}) ,1)[0];
+  S.schedule={cells:nx.cells,gaps:nx.gaps||[],weekStart:nx.weekStart,days:nx.days,counts:nx.counts,generatedAt:nx.generatedAt};
+  S.weekStart=nx.weekStart;
+  viewWeek=-1;
+  save(); render();
+  toast("Now on week "+fmtShort(nx.weekStart));
+}
+function archivePush(sc, source){
+  S.archive=S.archive.filter(function(a){ return a.weekStart!==sc.weekStart; });   // one entry per week
+  S.archive.push({weekStart:sc.weekStart,days:sc.days,cells:sc.cells,counts:sc.counts,
+    generatedAt:sc.generatedAt||new Date().toISOString(),source:source||"generated"});
+  S.archive.sort(function(a,b){ return a.weekStart<b.weekStart?1:-1; });
+  if(S.archive.length>160) S.archive.length=160;   // ~3 years of weeks
+}
+function recountWeek(sc){
+  var c={}, w={}, x={};
+  S.employees.forEach(function(e){ c[e.id]=0; w[e.id]=0; x[e.id]=0; });
+  Object.keys(sc.cells).forEach(function(k){
+    var p=k.split("_"), t=taskById(p[0]), d=+p[1];
+    sc.cells[k].forEach(function(a){
+      if(!a.empId || a.role) return;                 // training fills stay out of all counters
+      if(a.mergedFrom) return;                        // merged coverage: same person, one desk — no extra unit
+      if(c[a.empId]===undefined) return;
+      if(t && t.balance===false){ x[a.empId]++; return; }
+      if(d===5||d===6){
+        w[a.empId]=1;                                // WEEKENDS worked (0/1), not shift-days
+        if(t && t.type!=="we") c[a.empId]++;         // weekday-type work on a weekend still carries weekday workload
+      } else {
+        c[a.empId]++;
+      }
+    });
+  });
+  sc.counts=c; sc.weCounts=w; sc.extraCounts=x;
+}
+
+/* ---------- change requests ---------- */
+function applyChange(req, newEmpId){
+  var sc=S.schedule;
+  if(!sc || sc.weekStart!==req.weekStart){ toast("That week is no longer the active schedule"); return false; }
+  var task=taskById(req.taskId);
+  // weekend shifts are held by ONE person for the WHOLE weekend: a swap applies
+  // to both Saturday and Sunday together, keeping the trio intact
+  var daysToApply = (task && task.type==="we") ? [5,6] : [req.day];
+  var hits=[];
+  for(var di=0; di<daysToApply.length; di++){
+    var dd=daysToApply[di], keyD=req.taskId+"_"+dd, cellD=sc.cells[keyD]||[];
+    var hitD=null;
+    for(var i=0;i<cellD.length;i++){
+      if(cellD[i].empId===req.currentEmpId && (req.shift? cellD[i].shift===req.shift : true)){ hitD=cellD[i]; break; }
+    }
+    if(!hitD){ toast("Original assignment not found \u2014 schedule may have changed"); return false; }
+    var dIso=addDays(sc.weekStart,dd);
+    if(isAbsent(newEmpId,dIso)){ toast("Cannot apply: replacement is absent on "+DAY_NAMES[dd]); return false; }
+    var busyD=Object.keys(sc.cells).some(function(k2){
+      if(+k2.split("_")[1]!==dd) return false;
+      return sc.cells[k2].some(function(a){ return a.empId===newEmpId; });
+    });
+    if(busyD){ toast("Cannot apply: replacement already assigned on "+DAY_NAMES[dd]); return false; }
+    hits.push(hitD);
+  }
+  var dateIso=addDays(sc.weekStart, daysToApply[0]);
+  // floating rest rules: max 6 consecutive workdays, max 10 workdays in any rolling 14 days
+  var workedAll=buildWorkedDates();
+  workedAll[newEmpId]=workedAll[newEmpId]||{};
+  for(var si=0; si<daysToApply.length; si++){
+    if(!streakOK(workedAll,newEmpId,addDays(sc.weekStart,daysToApply[si]))){ toast("Cannot apply: replacement would exceed "+RULES().maxConsecutive+" consecutive working days"); return false; }
+  }
+  if(prevWeekendWorked(workedAll,newEmpId,mondayOf(dateIso))){
+    var wkDays={}; Object.keys(sc.cells).forEach(function(k2){
+      var d2=+k2.split("_")[1];
+      sc.cells[k2].forEach(function(a){ if(a.empId===newEmpId) wkDays[d2]=1; });
+    });
+    if(Object.keys(wkDays).length>=RULES().postWeekendCap){ toast("Cannot apply: replacement worked last weekend \u2014 max "+RULES().postWeekendCap+" days this week (compensation days off are guaranteed)"); return false; }
+  }
+  var t=taskById(req.taskId), ne=empById(newEmpId);
+  if(!t||!ne){ toast("Task or employee no longer exists"); return false; }
+  if(isLeader(ne) && !ne.escalated){ toast("Cannot apply: "+ne.name+" is a "+(ne.role==="tl"?"Team Leader":"Manager")+" and not escalated"); return false; }
+  if(isLeader(ne) && t.noEscalation){ toast("Cannot apply: "+t.name+" is tagged \u201Cno mandatory escalation\u201D \u2014 leadership is not pulled onto it"); return false; }
+  if(skillOf(ne,t.id)<2){ toast("Cannot apply: "+ne.name+" is level 1 on "+t.name+" \u2014 level 1 cannot do the task"); return false; }
+  hits.forEach(function(hd){
+    if(req.currentEmpId) bumpHist(req.currentEmpId,t.id,-1);
+    bumpHist(newEmpId,t.id,1);
+    hd.empId=newEmpId;
+    hd.training=skillOf(ne,t.id)<t.minLevel;
+  });
+  recountWeek(sc);
+  return true;
+}
+
+/* ---------- export (round-trip compatible with the import box) ---------- */
+function schedToRecords(sc, out){
+  out=out||[];
+  S.tasks.forEach(function(t){
+    for(var d=0;d<(sc.days||7);d++){
+      var cell=sc.cells[t.id+"_"+d]; if(!cell) continue;
+      cell.forEach(function(a){
+        if(!a.empId) return;
+        var e=empById(a.empId); if(!e) return;
+        var rec={date:addDays(sc.weekStart,d), task:t.name, employee:e.name};
+        if(a.shift) rec.shift=a.shift;
+        out.push(rec);
+      });
+    }
+  });
+  return out;
+}
+function buildRecords(scope){
+  var recs=[], map=allSchedules(), keys=Object.keys(map).sort();
+  if(scope==="week"){ if(S.schedule) schedToRecords(S.schedule,recs); }
+  else if(scope==="month"){
+    keys.forEach(function(ws){
+      var sc=map[ws];
+      for(var d=0;d<(sc.days||7);d++){ if(addDays(ws,d).slice(0,7)===viewMonth){ schedToRecords(sc,recs); break; } }
+    });
+    recs=recs.filter(function(r){ return r.date.slice(0,7)===viewMonth; });
+  }
+  else { keys.forEach(function(ws){ schedToRecords(map[ws],recs); }); }
+  recs.sort(function(a,b){ return a.date<b.date?-1:(a.date>b.date?1:0); });
+  return recs;
+}
+function csvCell(s){ s=String(s); return /[",\n]/.test(s) ? '"'+s.replace(/"/g,'""')+'"' : s; }
+function toCSV(recs){
+  var lines=["date,task,employee,shift"];
+  recs.forEach(function(r){ lines.push([r.date,csvCell(r.task),csvCell(r.employee),r.shift||""].join(",")); });
+  return lines.join("\n");
+}
+function downloadFile(name, text, mime){
+  try{
+    var blob=new Blob([text],{type:mime||"application/json"});
+    var a=document.createElement("a");
+    a.href=URL.createObjectURL(blob); a.download=name;
+    document.body.appendChild(a); a.click();
+    setTimeout(function(){ URL.revokeObjectURL(a.href); a.parentNode&&a.parentNode.removeChild(a); },400);
+  }catch(e){ toast("Download blocked \u2014 use the copy box instead"); }
+}
+function parseCSV(text){
+  var rows=[], row=[], cur="", inQ=false, i, ch;
+  for(i=0;i<text.length;i++){
+    ch=text[i];
+    if(inQ){ if(ch==='"'){ if(text[i+1]==='"'){ cur+='"'; i++; } else inQ=false; } else cur+=ch; }
+    else if(ch==='"') inQ=true;
+    else if(ch===","){ row.push(cur); cur=""; }
+    else if(ch==="\n"||ch==="\r"){ if(cur!==""||row.length){ row.push(cur); rows.push(row); row=[]; cur=""; } }
+    else cur+=ch;
+  }
+  if(cur!==""||row.length){ row.push(cur); rows.push(row); }
+  if(!rows.length) return null;
+  var head=rows[0].map(function(c){ return c.trim().toLowerCase(); });
+  var di=head.indexOf("date"), ti=head.indexOf("task"), ei=head.indexOf("employee"), si=head.indexOf("shift");
+  if(di<0||ti<0||ei<0) return null;
+  var recs=[];
+  rows.slice(1).forEach(function(r){
+    if(!r[di]) return;
+    var rec={date:r[di].trim(), task:(r[ti]||"").trim(), employee:(r[ei]||"").trim()};
+    if(si>-1 && r[si] && r[si].trim()) rec.shift=r[si].trim();
+    recs.push(rec);
+  });
+  return recs;
+}
+
+/* ---------- historical import (past years / months / days) ---------- */
+/* Accepted formats in the "Import past schedules" box:
+   1) Native archive:   [{weekStart, days, cells, counts?}, ...]  or one such object
+   2) Simple records:   {"records":[{"date":"YYYY-MM-DD","task":"Task name","employee":"Name","shift":"S1|S2|MID(optional)"}]}
+   Records are grouped into weeks, matched to tasks/employees by exact name,
+   stored in the archive and counted into the rotation history.            */
+function importPast(text){
+  var obj;
+  text=String(text||"").trim();
+  var f=text.charAt(0);
+  if(f!=="{" && f!=="["){                       // not JSON — try CSV (date,task,employee,shift)
+    var recs=parseCSV(text);
+    if(!recs){ toast("Unrecognized format \u2014 JSON or CSV with date,task,employee[,shift] header"); return; }
+    obj={records:recs};
+  } else {
+    try{ obj=JSON.parse(text); }catch(e){ toast("Invalid JSON"); return; }
+  }
+  var imported=0, skipped=0;
+  function isArchiveEntry(o){ return o && o.weekStart && o.cells; }
+  if(isArchiveEntry(obj)) obj=[obj];
+  if(Array.isArray(obj) && obj.length && isArchiveEntry(obj[0])){
+    obj.forEach(function(a){
+      if(!isArchiveEntry(a)){ skipped++; return; }
+      if(!a.counts) recountWeek(a);
+      Object.keys(a.cells).forEach(function(k){
+        var tId=k.split("_")[0];
+        a.cells[k].forEach(function(x){ if(x.empId && empById(x.empId) && taskById(tId)) bumpHist(x.empId,tId,1); });
+      });
+      archivePush({weekStart:a.weekStart,days:a.days||7,cells:a.cells,counts:a.counts},"imported");
+      imported++;
+    });
+  } else if(obj && Array.isArray(obj.records)){
+    var weeks={};
+    obj.records.forEach(function(r){
+      var t=taskByName(r.task), e=empByName(r.employee);
+      if(!t||!e||!r.date){ skipped++; return; }
+      var ws=mondayOf(r.date), d=dayIdxOf(r.date), key=t.id+"_"+d;
+      weeks[ws]=weeks[ws]||{weekStart:ws,days:7,cells:{}};
+      weeks[ws].cells[key]=weeks[ws].cells[key]||[];
+      weeks[ws].cells[key].push({empId:e.id, shift:r.shift||null});
+      bumpHist(e.id,t.id,1);
+      imported++;
+    });
+    Object.keys(weeks).forEach(function(ws){ recountWeek(weeks[ws]); archivePush(weeks[ws],"imported"); });
+  } else { toast("Unrecognized format \u2014 see the note under the box"); return; }
+  save(); render();
+  toast("Imported "+imported+" item(s)"+(skipped?", "+skipped+" skipped (unknown task/employee name)":""));
+}
+
+/* ---------- Ask AI (Claude API) ---------- */
+function getAiKey(){ try{ return localStorage.getItem(LS_AIKEY)||""; }catch(e){ return ""; } }
+function setAiKey(k){ try{ if(k) localStorage.setItem(LS_AIKEY,k); else localStorage.removeItem(LS_AIKEY); }catch(e){} }
+function buildContext(){
+  var lines=[];
+  lines.push("SCHEDULING RULES: the weekend is ONE coverage unit staffed by EXACTLY THREE collaborators \u2014 one Early, one Mid, one Late, the same trio on Saturday and Sunday \u2014 and that trio covers ALL other positions (nothing else is staffed on weekends); positions have a PRIORITY RANK \u2014 core positions are ALWAYS filled first in strict rank order; positions tagged SUGGEST are staffed only when spare people remain after every core position, and skipping them is never counted as workforce insufficiency; training positions run as per-day SESSIONS (date + trainer + trainees, visible on that exact day on the board); skill level 1 = CANNOT do the task AT ALL (never assigned, never via escalation, never offered as replacement; training sessions are the only path from 1 to 2); tasks require level 2 minimum; when few people hold a required level, that task's workload is balanced among the capable group only, and escalated leaders covering it rotate among themselves; weekend shifts (Early/Late/Mid) are each held by ONE person for the whole weekend (both Saturday and Sunday), per-day splits only as fallback; max 6 consecutive working days (checked across weeks); every collaborator is entitled to 2 days off per week as a FLOATING entitlement: recuperation for a worked weekend comes AFTER that weekend, the days off may be SPLIT (not together) and may fall in the FOLLOWING week, guaranteed by a hard cap of 10 workdays in any rolling 14-day window plus the 6-in-a-row limit; owed recuperation (recup counter) makes the scheduler rest that person early the next week; weekday and weekend balances are STRICTLY separate and use different units: weekdays balance WORKLOAD, weekends balance the NUMBER OF WEEKENDS each collaborator works per month (a Sat+Sun pair = one weekend); rest rules count the TOTALITY of worked days across both: weekend NOT worked means Sat+Sun ARE that week's days off (all five weekdays workable; a collaborator without a task on a weekday is an ALERT requiring a manual position assignment (flagged 'no task' on the board) and is NEVER a day off: weekday days off exist ONLY as compensation after a worked weekend, absolutely only); weekend WORKED means the FOLLOWING week is hard-capped at 5 worked days so 2 compensation days off come after the weekend (split allowed, an off next-weekend counts); plus never more than 6 consecutive workdays; balances are GOALS not gates \u2014 generation always fills schedules to the maximum the hard rules allow, and any imbalance (from vacations, training, missing people) is written to a signed carry ledger and compensated over the following weeks and months (availability-weighted, so vacation never creates work-debt); EXTRA positions and training days are outside both balances; before declaring any core gap the engine attempts CASCADE REDISTRIBUTION (a capable colleague assigned elsewhere that day moves onto the unfillable position and a free collaborator takes their vacated one, logged on the board); after redistribution the admin-defined MERGE RULES are tried in order (one collaborator covers two paired positions as one desk, no extra workload unit, logged on the board; a rule may also define a TASK REDISTRIBUTION: when it fires, a chosen third position runs that day under a new admin-defined name — same staffing, workload still counted toward the original position's balance); only then are unstaffable slots reported as WORKFORCE INSUFFICIENT.");
+  lines.push("EMPLOYEES (skill per task: 1=cannot do, 2=with support, 3=autonomous, 4=expert):");
+  S.employees.forEach(function(e){
+    var sk=S.tasks.map(function(t){ return t.name+"="+skillOf(e,t.id); }).join(", ");
+    var rl=isLeader(e)? " ["+(e.role==="tl"?"TEAM LEADER":"MANAGER")+(e.escalated?", escalated (assignable as last-resort cover)":", not assignable")+", outside workload balance]" : "";
+    lines.push("- "+e.name+rl+": "+sk);
+  });
+  lines.push("POSITIONS: "+S.tasks.map(function(t){
+    var base=t.name+" ("+(t.type==="we"?"weekend: Early+Late+Mid shifts":"weekdays, "+t.slots+" slot/day")+", min level "+t.minLevel
+      +(t.balance===false?", EXTRA position outside workload balance":"")
+      +(t.noEscalation?", NO MANDATORY ESCALATION (never staffed by leaders; left unfilled when workforce is short)":"")+")";
+    base=" [rank "+(t.rank||"?")+(t.optional?", SUGGEST: staffed only with spare people after all core positions":"")+"] "+base;
+    if(t.training){
+      var sess=(t.training.sessions||[]);
+      base+=" [TRAINING position with "+sess.length+" session(s): "
+        +sess.map(function(s2){var trE=empById(s2.trainerId);
+          return s2.date+" trainer "+(trE?trE.name:"?")+" trainees "+(s2.traineeIds||[]).map(function(id){var e=empById(id);return e?e.name:"";}).filter(Boolean).join("/");}).join("; ")
+        +"; session participants are out of normal rotation that day with zero workload]";
+    }
+    return base; }).join("; "));
+  var carriers=S.employees.filter(function(e){ return Math.abs(carryOf(e.id))>=0.5 || Math.abs(carryWeOf(e.id))>=0.5; });
+  if(carriers.length){
+    lines.push("WORKLOAD CARRY (signed; negative = behind fair share, will be assigned more in coming weeks/months; positive = ahead, gets lighter weeks; vacation never creates carry):");
+    carriers.forEach(function(e){
+      lines.push("- "+e.name+": weekday "+carryOf(e.id)+", weekend "+carryWeOf(e.id));
+    });
+  }
+  if(S.absences.length){
+    lines.push("ABSENCES (status pending = declared by the collaborator, awaiting admin review; rejected = not counted):");
+    S.absences.forEach(function(a){ var e=empById(a.empId);
+      lines.push("- "+(e?e.name:"?")+" "+ABS_TYPES[a.type]+" "+a.from+" to "+a.to+" ["+a.status+"]"
+        +(a.justification?" \u2014 justification: "+a.justification:"")
+        +((a.docs&&a.docs.length)?" ("+a.docs.length+" document(s) attached)":"")); });
+  }
+  function describe(sc,label){
+    lines.push(label+" (week of "+sc.weekStart+"):");
+    S.tasks.forEach(function(t){
+      for(var d=0;d<sc.days;d++){
+        var cell=sc.cells[t.id+"_"+d]; if(!cell||!cell.length) continue;
+        var who=cell.map(function(a){
+          var e=a.empId?empById(a.empId):null;
+          return (a.shift?shiftLabel(a.shift)+" shift: ":"")+(e?e.name:"UNFILLED")
+            +(a.role?" ("+a.role+")":(a.training?" (training)":""));
+        }).join(", ");
+        lines.push("- "+t.name+" "+DAY_NAMES[d]+" "+addDays(sc.weekStart,d)+": "+who);
+      }
+    });
+  }
+  if(S.schedule) describe(S.schedule,"CURRENT SCHEDULE");
+  S.archive.slice(0,8).forEach(function(a){ describe(a,"PAST SCHEDULE ("+a.source+")"); });
+  if(S.archive.length>8) lines.push("(+"+(S.archive.length-8)+" older archived weeks not shown; all-time task counts below reflect them)");
+  lines.push("ALL-TIME ASSIGNMENT COUNTS (employee -> task x times):");
+  S.employees.forEach(function(e){
+    var c=S.tasks.map(function(t){ return t.name+"\u00D7"+hist(e.id,t.id); }).join(", ");
+    lines.push("- "+e.name+": "+c);
+  });
+  if(S.requests.length){
+    lines.push("CHANGE REQUESTS:");
+    S.requests.slice(-15).forEach(function(r){
+      var t=taskById(r.taskId), ce=empById(r.currentEmpId), pe=empById(r.proposedEmpId);
+      lines.push("- ["+r.status+"] "+(r.requester||"someone")+" asked to replace "+(ce?ce.name:"?")+" with "+(pe?pe.name:"anyone")
+        +" on "+(t?t.name:"?")+" "+DAY_NAMES[r.day]+" week "+r.weekStart+(r.reason?" \u2014 reason: "+r.reason:""));
+    });
+  }
+  var ctx=lines.join("\n");
+  return ctx.length>16000 ? ctx.slice(0,16000)+"\n(truncated)" : ctx;
+}
+function askAI(question){
+  var key=getAiKey();
+  var headers={"Content-Type":"application/json"};
+  if(key){ headers["x-api-key"]=key; headers["anthropic-version"]="2023-06-01";
+           headers["anthropic-dangerous-direct-browser-access"]="true"; }
+  var convo=[];
+  chat.slice(-6).forEach(function(m){ convo.push({role:m.role==="q"?"user":"assistant",content:m.text}); });
+  var prompt="You are the analyst for a team scheduling board (financial operations control tower). "
+    +"Answer the question using ONLY the data below. Be concise and concrete; use names, dates and counts. "
+    +"If the data does not contain the answer, say so.\n\n=== BOARD DATA ===\n"+buildContext()
+    +"\n=== QUESTION ===\n"+question;
+  convo.push({role:"user",content:prompt});
+  return fetch("https://api.anthropic.com/v1/messages",{
+    method:"POST",headers:headers,
+    body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:1000,messages:convo})
+  }).then(function(r){ return r.json().then(function(j){ return {ok:r.ok,j:j}; }); })
+  .then(function(res){
+    if(!res.ok) throw new Error((res.j&&res.j.error&&res.j.error.message)||"API error");
+    return (res.j.content||[]).filter(function(b){return b.type==="text";})
+      .map(function(b){return b.text;}).join("\n").trim() || "(empty reply)";
+  });
+}
+
+/* ---------- views ---------- */
+function pendingCount(){ return S.requests.filter(function(r){return r.status==="pending"||r.status==="alt";}).length; }
+function render(){
+  document.querySelectorAll("#cts-tabs .cts-tab").forEach(function(b){
+    b.classList.toggle("cts-active", b.getAttribute("data-cts-tab")===activeTab);
+  });
+  var dot=document.getElementById("cts-reqdot");
+  var pc=pendingCount();
+  dot.innerHTML = pc? '<span class="cts-dot">'+pc+'</span>' : "";
+  ["board","team","tasks","merge","abs","req","rules","ai","data"].forEach(function(v){
+    document.getElementById("cts-view-"+v).classList.toggle("cts-hide", v!==activeTab);
+  });
+  if(activeTab==="board") renderBoard();
+  if(activeTab==="team") renderTeam();
+  if(activeTab==="tasks") renderTasks();
+  if(activeTab==="merge") renderMerge();
+  if(activeTab==="abs") renderAbs();
+  if(activeTab==="req") renderReq();
+  if(activeTab==="rules") renderRules();
+  if(activeTab==="ai") renderAI();
+  if(activeTab==="data") renderData();
+}
+
+function currentView(){
+  if(viewWeek===-1) return S.schedule;
+  return S.archive[viewWeek]||null;
+}
+function renderBoard(){
+  if(boardMode==="month") renderBoardMonth(); else renderBoardWeek();
+}
+function segHtml(){
+  return '<span class="cts-seg"><button id="cts-segw" class="'+(boardMode==="week"?"cts-sel":"")+'">Week</button>'
+   +'<button id="cts-segm" class="'+(boardMode==="month"?"cts-sel":"")+'">Month</button></span>';
+}
+function bindSeg(){
+  var w=document.getElementById("cts-segw"), m=document.getElementById("cts-segm");
+  if(w) w.addEventListener("click",function(){ boardMode="week"; renderBoard(); });
+  if(m) m.addEventListener("click",function(){ boardMode="month"; renderBoard(); });
+}
+function renderBoardMonth(){
+  var v=document.getElementById("cts-view-board");
+  var y=+viewMonth.split("-")[0], mo=+viewMonth.split("-")[1];
+  var monthName=new Date(y,mo-1,1).toLocaleString("en",{month:"long"});
+  var h='<div class="cts-toolbar">'+segHtml()
+   +'<span class="cts-monthnav"><button class="cts-btn cts-btn-sm" id="cts-mprev">\u2190</button>'
+   +'<span class="cts-mlabel">'+esc(monthName)+' '+y+'</span>'
+   +'<button class="cts-btn cts-btn-sm" id="cts-mnext">\u2192</button></span>'
+   +'<input type="month" id="cts-mpick" value="'+esc(viewMonth)+'" style="padding:4px 6px">'
+   +'<span class="cts-weeklabel">week schedules assembled from current + archive</span></div>';
+
+  var first=new Date(y,mo-1,1), last=new Date(y,mo,0);
+  var lead=(first.getDay()+6)%7;                       // Monday-first offset
+  var todayIso=iso(new Date());
+  h+='<div class="cts-calwrap"><div class="cts-cal">';
+  DAY_NAMES.forEach(function(dn,i){ h+='<div class="cts-dow'+(i>4?" cts-wkendcol":"")+'">'+dn+'</div>'; });
+  var totalCells=Math.ceil((lead+last.getDate())/7)*7;
+  for(var c=0;c<totalCells;c++){
+    var dnum=c-lead+1;
+    if(dnum<1 || dnum>last.getDate()){ h+='<div class="cts-day cts-out"></div>'; continue; }
+    var dateIso=y+"-"+pad2(mo)+"-"+pad2(dnum);
+    h+='<div class="cts-day"><div class="cts-dnum"><span class="'+(dateIso===todayIso?"cts-today":"")+'">'+dnum+'</span></div>';
+    var items=assignmentsForDate(dateIso);
+    if(items){
+      items.forEach(function(it){
+        var a=it.a, t=it.task;
+        var sh=a.shift?'<span class="cts-mshift">'+shiftLabel(a.shift).charAt(0)+(a.shift==="MID"?"M":"")+'</span> ':"";
+        if(!a.empId){ h+='<span class="cts-mini cts-mgap">'+sh+'UNFILLED <span class="cts-mtask">\u00B7 '+esc(t.name)+'</span></span>'; return; }
+        var e=empById(a.empId); if(!e) return;
+        if(a.role){
+          h+='<span class="cts-mini" style="border-left-color:'+(a.role==="trainer"?"var(--cts-blue)":"var(--cts-amber)")+'" title="'
+           +esc(t.name)+' \u2014 '+esc(e.name)+' ('+a.role+')">'+esc(e.name.split(" ")[0])
+           +' <span class="cts-mtask">\u00B7 '+esc(t.name)+' ('+a.role+')</span></span>';
+          return;
+        }
+        h+='<span class="cts-mini'+(a.training?" cts-mtrain":"")+'" title="'+esc(t.name)+' \u2014 '+esc(e.name)
+         +(a.shift?' ('+shiftLabel(a.shift)+')':"")+(a.training?" (training)":"")+'">'
+         +sh+esc(e.name.split(" ")[0])+' <span class="cts-mtask">\u00B7 '+esc(t.name)+'</span></span>';
+      });
+    }
+    S.employees.forEach(function(e){
+      var ty=isAbsent(e.id,dateIso);
+      if(ty) h+='<span class="cts-mini cts-mabs" title="'+esc(e.name)+' \u2014 '+ABS_TYPES[ty]+'">'+esc(e.name.split(" ")[0])+' \u00B7 '+ABS_TYPES[ty].toLowerCase()+'</span>';
+    });
+    h+='</div>';
+  }
+  h+='</div></div>';
+  h+='<div class="cts-note">Month view is read-only and merges every week it knows about (current schedule + archived + imported). Days with nothing shown have no schedule stored. Switch to Week view to generate or edit.</div>';
+  v.innerHTML=h;
+  bindSeg();
+  function shiftMonth(n){
+    var yy=+viewMonth.split("-")[0], mm=+viewMonth.split("-")[1]-1+n;
+    var d=new Date(yy,mm,1); viewMonth=d.getFullYear()+"-"+pad2(d.getMonth()+1); renderBoardMonth();
+  }
+  document.getElementById("cts-mprev").addEventListener("click",function(){ shiftMonth(-1); });
+  document.getElementById("cts-mnext").addEventListener("click",function(){ shiftMonth(1); });
+  document.getElementById("cts-mpick").addEventListener("change",function(){
+    if(this.value){ viewMonth=this.value; renderBoardMonth(); } });
+}
+
+/* ---------- week grid: BY POSITION (rows = positions) ---------- */
+function gridByPosition(sc){
+  var h='<div class="cts-boardwrap"><table class="cts-board"><thead><tr><th>Position</th>';
+  for(var d=0;d<sc.days;d++){
+    h+='<th class="'+(d>4?"cts-wkendcol":"")+'">'+DAY_NAMES[d]+'<span class="cts-date">'+fmtShort(addDays(sc.weekStart,d))+'</span></th>';
+  }
+  h+='</tr></thead><tbody>';
+  // the weekend rows must show the trio that was ACTUALLY generated: pick the
+  // weekend task that has Sat/Sun cells in THIS schedule; fall back to the
+  // structural primary (and hint to adapt) when the structure drifted.
+  var pwtTop=primaryWeekendTask();
+  var schedWe=null;
+  tasksByRank().forEach(function(tw){
+    if(schedWe || tw.type!=="we" || tw.training) return;
+    if((sc.cells[tw.id+"_5"]||[]).length || (sc.cells[tw.id+"_6"]||[]).length) schedWe=tw;
+  });
+  var weRowTask=schedWe||pwtTop;
+  var weDrift=!!(pwtTop && schedWe && schedWe.id!==pwtTop.id);
+  tasksByRank().forEach(function(t){
+    // THE weekend unit renders as three dedicated rows — Early / Mid / Late —
+    // each shift on its own line, its holder shown on Saturday and Sunday.
+    if(weRowTask && t.id===weRowTask.id && !t.training){
+      var order=[{k:"S1",label:"Early"},{k:"MID",label:"Mid"},{k:"S2",label:"Late"}];
+      order.forEach(function(sh,si){
+        h+='<tr><td class="cts-taskcell"><div class="cts-taskname">'
+         +(si===0?'<span style="font-family:var(--cts-mono);font-size:10px;color:var(--cts-mut)">#'+(t.rank||'?')+'</span> '+esc(t.name)+' <span class="cts-wetag">Weekend</span><br>':"")
+         +'<span class="cts-shift">'+sh.label+'</span></div>'
+         +(si===0?'<div class="cts-tasksub">min L'+t.minLevel+' \u00B7 same trio Sat + Sun \u00B7 covers all positions'+(weDrift?' <span class="cts-noesctag">structure changed \u2014 adapt to move the trio here</span>':'')+'</div>':"")+'</td>';
+        for(var d=0;d<sc.days;d++){
+          if(d<5){ h+='<td><span class="cts-na">\u2014</span></td>'; continue; }
+          var raw=sc.cells[t.id+"_"+d]||[];
+          var cell=raw.filter(function(a){ return (a.shift||null)===sh.k; });
+          if(!cell.length && si===0){
+            // legacy or drifted entries without shift markers: never hide an
+            // attributed person — show them on the first row, shift-agnostic
+            cell=raw.filter(function(a){ return a.empId && !a.shift; });
+          }
+          h+='<td>';
+          if(!cell.length) h+='<span class="cts-gap" title="No one attributed to this shift in the stored schedule \u2014 regenerate or adapt the structure">UNFILLED</span>';
+          cell.forEach(function(a){
+            if(!a.empId){ h+='<span class="cts-gap">UNFILLED</span> '; return; }
+            var e=empById(a.empId); if(!e){ h+='<span class="cts-gap">?</span>'; return; }
+            h+='<span class="cts-chip'+(a.training?" cts-training":"")+'">'+esc(e.name)+' '+pips(skillOf(e,t.id))
+             +(a.training?' <span class="cts-tag">train</span>':"")+'</span>';
+          });
+          h+='</td>';
+        }
+        h+='</tr>';
+      });
+      return;
+    }
+    h+='<tr><td class="cts-taskcell"><div class="cts-taskname"><span style="font-family:var(--cts-mono);font-size:10px;color:var(--cts-mut)">#'+(t.rank||'?')+'</span> '+esc(t.name)
+     +(t.type==="we"?'<span class="cts-wetag">Weekend</span>':"")
+     +(t.training?'<span class="cts-trtag">Training</span>':"")
+     +(t.balance===false?'<span class="cts-baltag cts-offbal">Extra</span>':"")
+     +(t.noEscalation?'<span class="cts-noesctag">no esc</span>':"")
+     +(t.optional?'<span class="cts-baltag cts-offbal" style="border-style:dashed">Suggest</span>':"")+'</div>'
+     +'<div class="cts-tasksub">'+(t.training
+        ? ((t.training.sessions||[]).length+' training session(s) \u00B7 out of rotation')
+        : 'min L'+t.minLevel+' \u00B7 '+(t.type==="we"?"Early + Late + Mid":t.slots+' slot'+(t.slots>1?"s":"")))+'</div></td>';
+    for(var d=0;d<sc.days;d++){
+      if((d===5||d===6) && weRowTask && t.id!==weRowTask.id && !t.training){
+        h+='<td><span class="cts-na" title="Covered by the weekend team (Early / Mid / Late)">weekend team</span></td>'; continue;
+      }
+      var active = t.training ? true : (t.type==="we" ? (d===5||d===6) : t.days.indexOf(d)>-1);
+      if(!active){ h+='<td><span class="cts-na">\u2014</span></td>'; continue; }
+      var cell=sc.cells[t.id+"_"+d]||[];
+      h+='<td>';
+      if(!cell.length) h+='<span class="cts-na">\u2014</span>';
+      cell.forEach(function(a){
+        var shiftTag=a.shift?'<span class="cts-shift">'+shiftLabel(a.shift)+'</span> ':"";
+        if(!a.empId){
+          if(a.optional){ h+='<span class="cts-na" title="Suggest position \u2014 skipped, no spare staff">'+(a.shift?shiftLabel(a.shift)+' ':'')+'no spare</span> '; }
+          else { h+='<span class="cts-gap">'+(a.shift?shiftLabel(a.shift)+" ":"")+'UNFILLED</span> '; }
+          return; }
+        var e=empById(a.empId); if(!e){ h+='<span class="cts-gap">?</span>'; return; }
+        if(a.mergedFrom){
+          var ms=taskById(a.mergedFrom);
+          var combo=(ms?ms.name:"?")+"+"+t.name;
+          h+='<span class="cts-chip" style="border-style:dashed" title="Two positions became one today: '+esc(combo)+' \u2014 held by '+esc(e.name)+'">'
+           +(a.shift?'<span class="cts-shift">'+shiftLabel(a.shift)+'</span> ':"")
+           +esc(combo)+' \u00B7 '+esc(e.name)+' <span class="cts-tag">\u21C4</span></span>';
+          return;
+        }
+        if(a.mergedWith){
+          var md=taskById(a.mergedWith);
+          var combo2=t.name+"+"+(md?md.name:"?");
+          h+='<span class="cts-chip" style="border-style:dashed" title="Two positions became one today: '+esc(combo2)+' \u2014 held by '+esc(e.name)+'">'
+           +(a.shift?'<span class="cts-shift">'+shiftLabel(a.shift)+'</span> ':"")
+           +esc(combo2)+' \u00B7 '+esc(e.name)+' <span class="cts-tag">\u21C4</span></span>';
+          return;
+        }
+        if(a.transformedName){
+          h+='<span class="cts-chip" style="border-style:dashed" title="Task redistribution after a merge \u2014 this position runs as '+esc(a.transformedName)+' today; workload still counts to the original position">'
+           +(a.shift?'<span class="cts-shift">'+shiftLabel(a.shift)+'</span> ':"")
+           +esc(e.name)+' <span class="cts-tag">\u2192 '+esc(a.transformedName)+'</span></span>';
+          return;
+        }
+        if(a.role){
+          h+='<span class="cts-chip cts-trainingcell">'+esc(e.name)
+           +' <span class="cts-role cts-role-'+a.role+'">'+a.role+'</span></span>';
+          return;
+        }
+        h+='<span class="cts-chip'+(a.training?" cts-training":"")+'">'+shiftTag+esc(e.name)+' '+pips(skillOf(e,t.id))
+         +(a.training?' <span class="cts-tag">train</span>':"")+(a.manual?' <span class="cts-tag" title="Manually set">M</span>':"")+'</span>';
+      });
+      h+='</td>';
+    }
+    h+='</tr>';
+  });
+  h+='<tr class="cts-absrow"><td class="cts-taskcell"><div class="cts-taskname" style="font-size:12px;color:var(--cts-mut)">Out today</div></td>';
+  for(var d2=0;d2<sc.days;d2++){
+    var dateIso=addDays(sc.weekStart,d2), outs="";
+    S.employees.forEach(function(e){
+      var ty=isAbsent(e.id,dateIso);
+      if(ty) outs+='<span class="cts-abschip cts-'+ty+'">'+esc(e.name.split(" ")[0])+' \u00B7 '+ABS_TYPES[ty].charAt(0)+'</span>';
+    });
+    h+='<td>'+(outs||'<span class="cts-na">\u2014</span>')+'</td>';
+  }
+  h+='</tr>';
+  var workedDay={};
+  Object.keys(sc.cells).forEach(function(k){
+    var dd=+k.split("_")[1]; workedDay[dd]=workedDay[dd]||{};
+    sc.cells[k].forEach(function(a){ if(a.empId) workedDay[dd][a.empId]=true; });
+  });
+  var workedAllP=buildWorkedDates();
+  var prevWeP={};
+  S.employees.forEach(function(e){
+    var w=workedAllP[e.id]||{};
+    prevWeP[e.id]=!!(w[addDays(sc.weekStart,-2)]||w[addDays(sc.weekStart,-1)]);
+  });
+  h+='<tr class="cts-absrow"><td class="cts-taskcell"><div class="cts-taskname" style="font-size:12px;color:var(--cts-mut)">Day off</div></td>';
+  for(var d3=0;d3<sc.days;d3++){
+    var dateIso3=addDays(sc.weekStart,d3), offs="";
+    S.employees.forEach(function(e){
+      if(isLeader(e)) return;
+      if(isAbsent(e.id,dateIso3)) return;
+      if(workedDay[d3] && workedDay[d3][e.id]) return;
+      if(d3===5||d3===6){ offs+='<span class="cts-abschip" style="color:var(--cts-green)">'+esc(e.name.split(" ")[0])+'</span>'; }
+      else if(prevWeP[e.id]){ offs+='<span class="cts-abschip" style="color:var(--cts-green)" title="Compensation after the worked weekend">'+esc(e.name.split(" ")[0])+' \u00B7 recup</span>'; }
+    });
+    h+='<td>'+(offs||'<span class="cts-na">\u2014</span>')+'</td>';
+  }
+  h+='</tr>';
+  h+='<tr class="cts-absrow"><td class="cts-taskcell"><div class="cts-taskname" style="font-size:12px;color:var(--cts-amber)">\u26A0 No task <span style="font-weight:400;color:var(--cts-mut)">(assign manually)</span></div></td>';
+  for(var d4=0;d4<sc.days;d4++){
+    var dateIso4=addDays(sc.weekStart,d4), sup="";
+    if(d4<5){
+      S.employees.forEach(function(e){
+        if(isLeader(e)) return;
+        if(isAbsent(e.id,dateIso4)) return;
+        if(workedDay[d4] && workedDay[d4][e.id]) return;
+        if(prevWeP[e.id]) return;                        // those are recup days, shown above
+        sup+='<span class="cts-abschip" style="color:var(--cts-amber);border-color:var(--cts-amber)">'+esc(e.name.split(" ")[0])+'</span>';
+      });
+    }
+    h+='<td>'+(sup||'<span class="cts-na">\u2014</span>')+'</td>';
+  }
+  h+='</tr></tbody></table></div>';
+  return h;
+}
+
+/* ---------- week grid: BY COLLABORATOR (rows = people, cells = their tasks) ---------- */
+function gridByCollaborator(sc){
+  var workedAllR=buildWorkedDates();
+  var prevWeWorkedR={};
+  S.employees.forEach(function(e){
+    var w=workedAllR[e.id]||{};
+    prevWeWorkedR[e.id]=!!(w[addDays(sc.weekStart,-2)]||w[addDays(sc.weekStart,-1)]);
+  });
+  // reverse map: day -> empId -> [{t, a}]
+  var byEmp={};
+  Object.keys(sc.cells).forEach(function(k){
+    var p=k.split("_"), t=taskById(p[0]), d=+p[1];
+    if(!t) return;
+    sc.cells[k].forEach(function(a){
+      if(!a.empId) return;
+      byEmp[a.empId]=byEmp[a.empId]||{};
+      byEmp[a.empId][d]=byEmp[a.empId][d]||[];
+      byEmp[a.empId][d].push({t:t, a:a});
+    });
+  });
+  var rows=S.employees.filter(function(e){ return !isLeader(e) || byEmp[e.id]; });
+  var h='<div class="cts-boardwrap"><table class="cts-board"><thead><tr><th>Collaborator</th>';
+  for(var d=0;d<sc.days;d++){
+    h+='<th class="'+(d>4?"cts-wkendcol":"")+'">'+DAY_NAMES[d]+'<span class="cts-date">'+fmtShort(addDays(sc.weekStart,d))+'</span></th>';
+  }
+  h+='</tr></thead><tbody>';
+  rows.forEach(function(e){
+    var weekN=(sc.counts&&sc.counts[e.id])||0;
+    h+='<tr><td class="cts-taskcell"><div class="cts-taskname" style="white-space:nowrap">'+avatar(e,22)+' '+esc(e.name)+roleTag(e)+'</div>'
+     +'<div class="cts-tasksub">'+weekN+' weekday assignment'+(weekN===1?"":"s")
+     +((sc.weCounts&&sc.weCounts[e.id])?' \u00B7 weekend':"")+'</div></td>';
+    for(var d=0;d<sc.days;d++){
+      var dateIso=addDays(sc.weekStart,d);
+      var ty=isAbsent(e.id,dateIso);
+      var items=(byEmp[e.id]&&byEmp[e.id][d])||[];
+      h+='<td>';
+      if(items.length){
+        items.forEach(function(it){
+          var t=it.t, a=it.a;
+          var shiftTag=a.shift?'<span class="cts-shift">'+shiftLabel(a.shift)+'</span> ':"";
+          if(a.mergedFrom){
+            // combined chip is rendered from the source side — skip the duplicate
+          } else if(a.mergedWith){
+            var mdw=taskById(a.mergedWith);
+            var combo3=t.name+"+"+(mdw?mdw.name:"?");
+            h+='<span class="cts-chip" style="border-style:dashed" title="Two positions became one today">'+esc(combo3)+' <span class="cts-tag">\u21C4</span></span>';
+          } else if(a.transformedName){
+            h+='<span class="cts-chip" style="border-style:dashed" title="'+esc(t.name)+' runs as '+esc(a.transformedName)+' today (task redistribution after a merge); balance counts to the original">'
+             +esc(a.transformedName)+' <span class="cts-tag">\u2190 '+esc(t.name)+'</span></span>';
+          } else if(a.role){
+            h+='<span class="cts-chip cts-trainingcell">'+esc(t.name)
+             +' <span class="cts-role cts-role-'+a.role+'">'+a.role+'</span></span>';
+          } else {
+            h+='<span class="cts-chip'+(a.training?" cts-training":"")+'" title="'+esc(t.name)+' \u2014 level '+skillOf(e,t.id)+'/4">'
+             +shiftTag+esc(t.name)+' '+pips(skillOf(e,t.id))
+             +(a.training?' <span class="cts-tag">train</span>':"")+(a.manual?' <span class="cts-tag" title="Manually set">M</span>':"")+'</span>';
+          }
+        });
+      } else if(ty){
+        h+='<span class="cts-abschip cts-'+ty+'">'+ABS_TYPES[ty]+'</span>';
+      } else if(isLeader(e)){
+        h+='<span class="cts-na">\u2014</span>';
+      } else if(d===5||d===6){
+        h+='<span class="cts-abschip" style="color:var(--cts-green)">off</span>';   // weekend not worked = THE days off
+      } else if(prevWeWorkedR[e.id]){
+        h+='<span class="cts-abschip" style="color:var(--cts-green)" title="Compensation after the worked weekend">off \u00B7 recup</span>';
+      } else {
+        h+='<span class="cts-abschip" style="color:var(--cts-amber);border-color:var(--cts-amber)" title="No task assigned \u2014 give a manual position (weekday days off exist ONLY after a worked weekend)">\u26A0 no task</span>';
+      }
+      h+='</td>';
+    }
+    h+='</tr>';
+  });
+  // unstaffed strip: gaps belong to nobody, keep them visible
+  if(sc.merges && sc.merges.length){
+    h+='<div class="cts-note">\u21C4 '+sc.merges.length+' merge(s) applied: '
+     +sc.merges.map(function(m){ return esc(m.task)+" merged with "+esc(m.withTask)+" on "+DAY_NAMES[m.day]+" (held by "+esc(m.emp)+")"+(m.replaced?" \u2014 "+esc(m.replaced)+" runs as "+esc(m.as):""); }).join("; ")+'</div>';
+  }
+  if(sc.redist && sc.redist.length){
+    h+='<div class="cts-note">\u21C4 '+sc.redist.length+' redistribution(s) so priority positions could be staffed: '
+     +sc.redist.map(function(r){ return esc(r.moved)+" moved "+esc(r.from)+" \u2192 "+esc(r.to)+" on "+DAY_NAMES[r.day]+" (freed slot taken by "+esc(r.freed)+")"; }).join("; ")+'</div>';
+  }
+  var cg=coreGaps(sc), og=optGaps(sc);
+  if(cg.length||og.length){
+    h+='<tr class="cts-absrow"><td class="cts-taskcell"><div class="cts-taskname" style="font-size:12px;color:var(--cts-mut)">Unstaffed</div></td>';
+    for(var d4=0;d4<sc.days;d4++){
+      var cell="";
+      cg.forEach(function(g){ if(g.day===d4) cell+='<span class="cts-gap">'+esc(g.task)+(g.shift?' '+shiftLabel(g.shift):"")+'</span> '; });
+      og.forEach(function(g){ if(g.day===d4) cell+='<span class="cts-na" title="Suggest position skipped \u2014 no spare staff">'+esc(g.task)+(g.shift?' '+shiftLabel(g.shift):"")+' (no spare)</span> '; });
+      h+='<td>'+(cell||'<span class="cts-na">\u2014</span>')+'</td>';
+    }
+    h+='</tr>';
+  }
+  h+='</tbody></table></div>';
+  return h;
+}
+
+function renderBoardWeek(){
+  var v=document.getElementById("cts-view-board");
+  var h='<div class="cts-toolbar">'+segHtml();
+  // week selector: current + archive
+  h+='<select id="cts-weeksel"><option value="-1"'+(viewWeek===-1?" selected":"")+'>Current'
+   +(S.schedule?' \u2014 '+fmtShort(S.schedule.weekStart):"")+'</option>';
+  S.archive.forEach(function(a,i){
+    h+='<option value="'+i+'"'+(viewWeek===i?" selected":"")+'>Week of '+esc(a.weekStart)+' ('+esc(a.source)+')</option>';
+  });
+  h+='</select>';
+  if(admin && viewWeek===-1){
+    h+='<label style="font-size:12px;color:var(--cts-mut)">Week of</label>'
+     +'<input type="date" id="cts-weekstart" value="'+esc(S.weekStart)+'">'
+     +'<button class="cts-btn cts-btn-primary" id="cts-gen">Generate schedule</button>'
+     +'<button class="cts-btn" id="cts-gen3" title="Generates 13 consecutive weeks starting from the week above. Locked once generated.">Generate 3 months</button>'
+     +'<button class="cts-btn cts-btn-sm" id="cts-adv" title="Archive the current week and load the next generated week">Advance week \u2192</button>';
+  }
+  var sc=currentView();
+  h+='<span class="cts-seg"><button id="cts-segbyc" class="'+(boardBy==="collab"?"cts-sel":"")+'">By collaborator</button>'
+   +'<button id="cts-segbyp" class="'+(boardBy==="pos"?"cts-sel":"")+'">By position</button></span>';
+  h+='<span class="cts-weeklabel">'+(sc? "Week "+fmtShort(sc.weekStart)+" \u2192 "+fmtShort(addDays(sc.weekStart,sc.days-1)) : "No schedule yet")+'</span>';
+  if(viewWeek!==-1) h+='<span class="cts-archnote">ARCHIVED \u2014 read-only</span>';
+  h+='</div>';
+
+  if(!sc){
+    h+='<div class="cts-empty">No schedule generated for this week yet.'+(admin?' Set the week and click <b>Generate schedule</b>.':' Ask an admin to generate one.')+'</div>';
+    v.innerHTML=h; bindBoard(); return;
+  }
+  if(viewWeek!==-1 && sc.structHash && sc.structHash!==structHash()){
+    h+='<div class="cts-banner cts-banner-warn"><b>Structure changed since this week was generated</b>'
+     +'<span>Positions, rules or merges differ from when this week was built \u2014 assignments may not match the current structure.'
+     +(admin?' Use \u201CAdapt schedules\u201d on the current week to regenerate current + future weeks.':'')+'</span></div>';
+  }
+  if(viewWeek===-1 && sc.structHash && sc.structHash!==structHash()){
+    h+='<div class="cts-banner cts-banner-warn"><b>Structure changed</b>'
+     +'<span>Positions were added, removed or reconfigured after this schedule was generated.</span>'
+     +(admin?'<button class="cts-btn cts-btn-sm cts-btn-primary" id="cts-restruct">Adapt schedules to new structure</button>'
+            :'<span style="color:var(--cts-mut)">An admin can regenerate the current and future weeks.</span>')
+     +'</div>';
+  }
+  if(viewWeek===-1 && sc.gaps && coreGaps(sc).length){
+    h+='<div class="cts-banner cts-banner-bad"><b>Workforce insufficient</b>'
+     +'<span>'+coreGaps(sc).length+' PRIORITY slot(s) could not be staffed under the rules (skills, absences, max '+RULES().maxConsecutive
+     +' consecutive days, '+RULES().postWeekendCap+'-day cap in the week after a worked weekend). Consider escalating a Team Leader / Manager or adjusting positions.</span></div>';
+  }
+  // amber alert: collaborators present without a task -> manual position needed
+  (function(){
+    var workedDayB={};
+    Object.keys(sc.cells).forEach(function(k){
+      var dd=+k.split("_")[1]; workedDayB[dd]=workedDayB[dd]||{};
+      sc.cells[k].forEach(function(a){ if(a.empId) workedDayB[dd][a.empId]=true; });
+    });
+    var workedAllB=buildWorkedDates();
+    var alerts=0;
+    for(var db=0; db<Math.min(5,sc.days); db++){
+      var dIso=addDays(sc.weekStart,db);
+      S.employees.forEach(function(e){
+        if(isLeader(e)) return;
+        if(isAbsent(e.id,dIso)) return;
+        if(workedDayB[db] && workedDayB[db][e.id]) return;
+        var w=workedAllB[e.id]||{};
+        if(w[addDays(sc.weekStart,-2)]||w[addDays(sc.weekStart,-1)]) return;   // recup day, legitimate
+        alerts++;
+      });
+    }
+    if(alerts>0){
+      h+='<div class="cts-banner cts-banner-warn"><b>\u26A0 '+alerts+' collaborator-day'+(alerts>1?'s':'')+' without a task</b>'
+       +'<span>These people are present (weekday, not absent, no recuperation owed) but received no position \u2014 assign one manually. They are marked \u201Cno task\u201d on the grid.</span></div>';
+    }
+  })();
+  h+= boardBy==="collab" ? gridByCollaborator(sc) : gridByPosition(sc);
+  if(admin && viewWeek===-1){
+    h+='<div class="cts-cardbox" style="margin-top:14px"><h3>Manual scheduling</h3>'
+     +'<div class="cts-note" style="margin:6px 0 8px">Assign, replace or remove anyone on any slot of the current week. Hard rules still apply (level 1 never, absences, '+RULES().maxConsecutive+'-day streak, post-weekend cap). Weekend shifts apply to <b>both days</b>. Manual entries are tagged <b>M</b> and are overwritten if the week is regenerated.</div>'
+     +'<div class="cts-formrow">'
+     +'<select id="cts-man-task"><option value="">Position\u2026</option>';
+    tasksByRank().forEach(function(t){ if(t.training) return; h+='<option value="'+t.id+'">#'+(t.rank!=null?t.rank:"?")+' '+esc(t.name)+(t.type==="we"?" (weekend)":"")+'</option>'; });
+    h+='</select><select id="cts-man-day"><option value="">Day\u2026</option></select>'
+     +'<select id="cts-man-shift" class="cts-hide"><option value="S1">Early</option><option value="MID">Mid</option><option value="S2">Late</option></select>'
+     +'<select id="cts-man-cur"><option value="">Slot\u2026</option></select>'
+     +'<select id="cts-man-new"><option value="">New collaborator\u2026</option></select>'
+     +'<button class="cts-btn cts-btn-primary" id="cts-man-apply">Apply</button></div></div>';
+  }
+
+
+
+
+  h+='<div class="cts-panels"><div class="cts-cardbox"><h3>Weekday workload balance</h3>';
+  var balList=S.employees.filter(inBalance);
+  var maxC=1; balList.forEach(function(e){ maxC=Math.max(maxC,(sc.counts&&sc.counts[e.id])||0); });
+  balList.forEach(function(e){
+    var c=(sc.counts&&sc.counts[e.id])||0;
+    var cy=carryOf(e.id);
+    h+='<div class="cts-fairrow"><span class="cts-fairname">'+esc(e.name)+'</span>'
+     +'<span class="cts-fairbarwrap"><span class="cts-fairbar" style="width:'+Math.round(c/maxC*100)+'%"></span></span>'
+     +'<span class="cts-faircount">'+c+'</span>'
+     +(cy<=-0.5?'<span class="cts-debt" title="Behind fair share \u2014 the scheduler will assign more in the coming weeks/months to compensate">behind '+(-cy)+'</span>':"")
+     +(cy>=0.5?'<span class="cts-debt" style="color:var(--cts-mut)" title="Ahead of fair share \u2014 gets lighter weeks until compensated">ahead '+cy+'</span>':"")
+     +'</div>';
+  });
+  var weTotal=0; balList.forEach(function(e){ weTotal+=(sc.weCounts&&sc.weCounts[e.id])||0; });
+  if(weTotal>0 || S.tasks.some(function(t){return t.type==="we";})){
+    // WEEKENDS worked this calendar month (month of this week's Saturday), from every stored week
+    var satIso=addDays(sc.weekStart,5), refMonth=satIso.slice(0,7);
+    var monthWe={}; balList.forEach(function(e){ monthWe[e.id]=0; });
+    var map=allSchedules();
+    Object.keys(map).forEach(function(ws2){
+      if(addDays(ws2,5).slice(0,7)!==refMonth) return;
+      var sc2=map[ws2], seen={};
+      Object.keys(sc2.cells).forEach(function(k2){
+        var p2=k2.split("_"), d2=+p2[1], t2=taskById(p2[0]);
+        if(d2!==5 && d2!==6) return;
+        if(t2 && t2.balance===false) return;
+        sc2.cells[k2].forEach(function(a2){
+          if(!a2.empId || a2.role || seen[a2.empId]) return;
+          if(monthWe[a2.empId]!==undefined){ monthWe[a2.empId]++; seen[a2.empId]=true; }
+        });
+      });
+    });
+    h+='<h3 style="margin-top:14px">Weekends worked \u2014 '+esc(refMonth)+' <span style="font-weight:400;letter-spacing:0;text-transform:none">(balanced per month, separate from weekday workload)</span></h3>';
+    var maxW=1; balList.forEach(function(e){ maxW=Math.max(maxW,monthWe[e.id]||0); });
+    balList.forEach(function(e){
+      var cw=monthWe[e.id]||0;
+      var cyw=carryWeOf(e.id);
+      h+='<div class="cts-fairrow"><span class="cts-fairname">'+esc(e.name)+'</span>'
+       +'<span class="cts-fairbarwrap"><span class="cts-fairbar" style="width:'+Math.round(cw/maxW*100)+'%;background:var(--cts-blue)"></span></span>'
+       +'<span class="cts-faircount">'+cw+'</span>'
+       +(cyw<=-0.5?'<span class="cts-debt">behind '+(-cyw)+'</span>':"")
+       +(cyw>=0.5?'<span class="cts-debt" style="color:var(--cts-mut)">ahead '+cyw+'</span>':"")
+       +'</div>';
+    });
+  }
+  function totAll(e){ return ((sc.counts&&sc.counts[e.id])||0)+((sc.weCounts&&sc.weCounts[e.id])||0)+((sc.extraCounts&&sc.extraCounts[e.id])||0); }
+  var escLines=S.employees.filter(function(e){ return isLeader(e) && totAll(e)>0; });
+  if(escLines.length){
+    h+='<div class="cts-note" style="margin-top:8px">Escalation cover (outside the balance): '
+     +escLines.map(function(e){ return esc(e.name)+" \u00D7"+totAll(e); }).join(", ")+'</div>';
+  }
+  var extraLines=S.employees.filter(function(e){ return sc.extraCounts && sc.extraCounts[e.id]>0; });
+  if(extraLines.length){
+    h+='<div class="cts-note" style="margin-top:4px">Extra positions (not balanced): '
+     +extraLines.map(function(e){ return esc(e.name)+" \u00D7"+sc.extraCounts[e.id]; }).join(", ")+'</div>';
+  }
+  h+='</div><div class="cts-cardbox"><h3>Coverage risk per position</h3>';
+  S.tasks.forEach(function(t){
+    if(t.training){
+      h+='<div class="cts-risk"><span>'+esc(t.name)+' <span class="cts-trtag">Training</span></span>'
+       +'<span class="cts-risk-flag cts-warn">out of rotation</span></div>';
+      return;
+    }
+    var q=S.employees.filter(function(e){ return skillOf(e,t.id)>=t.minLevel; }).length;
+    var cls=q>=3?"cts-ok":(q===2?"cts-warn":"cts-bad");
+    var lbl=q>=3?"OK":(q===2?"THIN":(q===1?"SINGLE POINT":"NOBODY QUALIFIED"));
+    h+='<div class="cts-risk"><span>'+esc(t.name)+(t.type==="we"?' <span class="cts-wetag">WE</span>':"")+'</span><span class="cts-risk-flag '+cls+'">'+q+' qualified \u00B7 '+lbl+'</span></div>';
+  });
+  if(sc.merges && sc.merges.length){
+    h+='<div class="cts-note">\u21C4 '+sc.merges.length+' merge(s) applied: '
+     +sc.merges.map(function(m){ return esc(m.task)+" merged with "+esc(m.withTask)+" on "+DAY_NAMES[m.day]+" (held by "+esc(m.emp)+")"+(m.replaced?" \u2014 "+esc(m.replaced)+" runs as "+esc(m.as):""); }).join("; ")+'</div>';
+  }
+  if(sc.redist && sc.redist.length){
+    h+='<div class="cts-note">\u21C4 '+sc.redist.length+' redistribution(s) so priority positions could be staffed: '
+     +sc.redist.map(function(r){ return esc(r.moved)+" moved "+esc(r.from)+" \u2192 "+esc(r.to)+" on "+DAY_NAMES[r.day]+" (freed slot taken by "+esc(r.freed)+")"; }).join("; ")+'</div>';
+  }
+  var cg=coreGaps(sc), og=optGaps(sc);
+  if(cg.length){
+    h+='<div class="cts-note cts-bad">'+cg.length+' PRIORITY slot(s) unfilled: '
+     +cg.map(function(g){return esc(g.task)+" ("+DAY_NAMES[g.day]+(g.shift?" "+shiftLabel(g.shift):"")+")";}).join(", ")+'</div>';
+  }
+  if(og.length){
+    h+='<div class="cts-note">'+og.length+' SUGGEST slot(s) skipped \u2014 no spare staff: '
+     +og.map(function(g){return esc(g.task)+" ("+DAY_NAMES[g.day]+(g.shift?" "+shiftLabel(g.shift):"")+")";}).join(", ")+'</div>';
+  }
+  h+='</div></div>';
+  v.innerHTML=h; bindBoard();
+}
+function manualEligibleNew(t, days, curEmpId){
+  var sc=S.schedule, out=[];
+  S.employees.forEach(function(e){
+    if(e.id===curEmpId) return;
+    if(skillOf(e,t.id)<2) return;                          // level 1: never, not even manually
+    var absent=false, busyNames=[];
+    days.forEach(function(dd){
+      var dIso=addDays(sc.weekStart,dd);
+      if(isAbsent(e.id,dIso)) absent=true;
+      Object.keys(sc.cells).forEach(function(k2){
+        var p2=k2.split("_");
+        if(+p2[1]!==dd) return;
+        sc.cells[k2].forEach(function(a){
+          if(a.empId!==e.id) return;
+          if(a.role){ absent=true; return; }               // training day: locked
+          var t2=taskById(p2[0]);
+          if(t2 && busyNames.indexOf(t2.name)===-1) busyNames.push(t2.name);
+        });
+      });
+    });
+    if(absent) return;
+    out.push({e:e, busy:busyNames});
+  });
+  return out;
+}
+function manualApply(taskId, day, shift, curEmpId, newEmpId){
+  var sc=S.schedule; if(!sc){ toast("No active schedule"); return false; }
+  var t=taskById(taskId); if(!t){ toast("Pick a position"); return false; }
+  var days = t.type==="we" ? [5,6] : [day];
+  if(newEmpId && newEmpId!=="__remove__"){
+    var ne=empById(newEmpId); if(!ne) return false;
+    if(skillOf(ne,t.id)<2){ toast(ne.name+" is level 1 on "+t.name+" \u2014 cannot do this position at all"); return false; }
+    var workedAll=buildWorkedDates();
+    workedAll[newEmpId]=workedAll[newEmpId]||{};
+    for(var i=0;i<days.length;i++){
+      var dIso=addDays(sc.weekStart,days[i]);
+      if(isAbsent(newEmpId,dIso)){ toast("Cannot apply: "+ne.name+" is absent on "+DAY_NAMES[days[i]]); return false; }
+      if(!streakOK(workedAll,newEmpId,dIso)){ toast("Cannot apply: would exceed "+RULES().maxConsecutive+" consecutive days"); return false; }
+    }
+    if(prevWeekendWorked(workedAll,newEmpId,sc.weekStart)){
+      var wk={}; Object.keys(sc.cells).forEach(function(k3){
+        var d3=+k3.split("_")[1];
+        sc.cells[k3].forEach(function(a){ if(a.empId===newEmpId) wk[d3]=1; });
+      });
+      if(Object.keys(wk).length+days.length>RULES().postWeekendCap){ toast("Cannot apply: worked last weekend \u2014 max "+RULES().postWeekendCap+" days this week"); return false; }
+    }
+  }
+  if(newEmpId && newEmpId!=="__remove__"){
+    // MOVE semantics: vacate any other assignment the person holds on those days.
+    // The vacated slot becomes a visible UNFILLED so nothing disappears silently.
+    days.forEach(function(dd){
+      Object.keys(sc.cells).forEach(function(k4){
+        var p4=k4.split("_");
+        if(+p4[1]!==dd || p4[0]===taskId) return;
+        sc.cells[k4].forEach(function(a){
+          if(a.empId!==newEmpId || a.role) return;
+          var t4=taskById(p4[0]);
+          if(t4) bumpHist(newEmpId,t4.id,-1);
+          a.empId=null; delete a.manual; delete a.training; delete a.transformedName; delete a.mergedFrom; delete a.mergedWith;
+        });
+      });
+    });
+  }
+  days.forEach(function(dd){
+    var key=taskId+"_"+dd; sc.cells[key]=sc.cells[key]||[];
+    var arr=sc.cells[key], hit=null;
+    for(var j=0;j<arr.length;j++){
+      var a=arr[j];
+      var shiftMatch = t.type==="we" ? (a.shift||null)===shift : true;
+      var empMatch = curEmpId ? a.empId===curEmpId : !a.empId;
+      if(shiftMatch && empMatch && !a.role){ hit=a; break; }
+    }
+    if(newEmpId==="__remove__"){
+      if(hit && hit.empId){ bumpHist(hit.empId,t.id,-1); hit.empId=null; delete hit.manual; delete hit.training; delete hit.transformedName; delete hit.mergedFrom; delete hit.mergedWith; }
+      return;
+    }
+    if(hit){
+      if(hit.empId) bumpHist(hit.empId,t.id,-1);
+      hit.empId=newEmpId; hit.manual=true;
+      hit.training=skillOf(empById(newEmpId),t.id)<t.minLevel;
+      delete hit.mergedFrom; delete hit.mergedWith; delete hit.transformedName;
+    } else {
+      arr.push({empId:newEmpId, shift:(t.type==="we"?shift:null), manual:true,
+                training:skillOf(empById(newEmpId),t.id)<t.minLevel});
+    }
+    bumpHist(newEmpId,t.id,1);
+  });
+  recountWeek(sc);
+  save();
+  return true;
+}
+function bindManual(){
+ try{
+  var tSel=document.getElementById("cts-man-task");
+  if(!tSel) return;
+  var dSel=document.getElementById("cts-man-day"), shSel=document.getElementById("cts-man-shift"),
+      cSel=document.getElementById("cts-man-cur"), nSel=document.getElementById("cts-man-new"),
+      ap=document.getElementById("cts-man-apply");
+  function refreshDays(){
+    var t=taskById(tSel.value);
+    var hh="";
+    if(!t){ dSel.innerHTML='<option value="">Day\u2026</option>'; shSel.classList.add("cts-hide"); return; }
+    if(t.type==="we"){
+      hh='<option value="5">Weekend (Sat + Sun)</option>';
+      shSel.classList.remove("cts-hide");
+    } else {
+      shSel.classList.add("cts-hide");
+      t.days.forEach(function(d){ hh+='<option value="'+d+'">'+DAY_NAMES[d]+'</option>'; });
+    }
+    dSel.innerHTML=hh; refreshCur();
+  }
+  function refreshCur(){
+    var t=taskById(tSel.value), sc=S.schedule;
+    var hh='<option value="">(empty slot)</option>';
+    if(t && sc){
+      var d=+dSel.value||(t.type==="we"?5:0);
+      var sh=t.type==="we"?shSel.value:null;
+      (sc.cells[t.id+"_"+d]||[]).forEach(function(a){
+        if(!a.empId||a.role) return;
+        if(t.type==="we" && (a.shift||null)!==sh) return;
+        var e=empById(a.empId); if(!e) return;
+        hh+='<option value="'+e.id+'">replace: '+esc(e.name)+'</option>';
+      });
+    }
+    cSel.innerHTML=hh; refreshNew();
+  }
+  function refreshNew(){
+    var t=taskById(tSel.value);
+    var hh='<option value="">New collaborator\u2026</option>';
+    if(t){
+      var d=+dSel.value||(t.type==="we"?5:0);
+      var days=t.type==="we"?[5,6]:[d];
+      manualEligibleNew(t, days, cSel.value||null).forEach(function(it){
+        var e=it.e;
+        hh+='<option value="'+e.id+'">'+esc(e.name)+' \u2014 L'+skillOf(e,t.id)
+          +(isLeader(e)?" ("+(e.role==="mgr"?"Manager":"Team Leader")+")":"")
+          +(it.busy.length?" (moves from "+esc(it.busy.join(", "))+")":"")+'</option>';
+      });
+      if(cSel.value) hh+='<option value="__remove__">\u2715 Remove this assignment</option>';
+    }
+    nSel.innerHTML=hh;
+  }
+  tSel.addEventListener("change",refreshDays);
+  dSel.addEventListener("change",refreshCur);
+  shSel.addEventListener("change",refreshCur);
+  cSel.addEventListener("change",refreshNew);
+  ap.addEventListener("click",function(){
+    if(!tSel.value){ toast("Pick a position"); return; }
+    var t=taskById(tSel.value);
+    if(!nSel.value){ toast("Pick the new collaborator (or Remove)"); return; }
+    var ok=manualApply(tSel.value, +dSel.value||0, t.type==="we"?shSel.value:null, cSel.value||null, nSel.value);
+    if(ok){ toast("Schedule updated manually"); renderBoardWeek(); }
+  });
+  refreshDays();
+ }catch(err){ try{ toast("Manual scheduling failed to initialise: "+err.message); }catch(e2){} }
+}
+function bindBoard(){
+  bindSeg();
+  bindManual();
+  var bc=document.getElementById("cts-segbyc"), bp=document.getElementById("cts-segbyp");
+  if(bc) bc.addEventListener("click",function(){ boardBy="collab"; renderBoardWeek(); });
+  if(bp) bp.addEventListener("click",function(){ boardBy="pos"; renderBoardWeek(); });
+  var sel=document.getElementById("cts-weeksel");
+  if(sel) sel.addEventListener("change",function(){ viewWeek=+this.value; renderBoard(); });
+  var ws=document.getElementById("cts-weekstart");
+  if(ws) ws.addEventListener("change",function(){ S.weekStart=this.value; save(); });
+  var g=document.getElementById("cts-gen");
+  if(g) g.addEventListener("click",generate);
+  var g3=document.getElementById("cts-gen3");
+  if(g3) g3.addEventListener("click",function(){
+    if(confirm("Generate the next 3 months (13 weeks) starting "+S.weekStart+"? Once generated, these weeks are locked against regeneration.")) generateNextMonths();
+  });
+  var adv=document.getElementById("cts-adv");
+  if(adv) adv.addEventListener("click",advanceWeek);
+  var rs=document.getElementById("cts-restruct");
+  if(rs) rs.addEventListener("click",function(){
+    if(confirm("Adapt schedules to the new position structure? The current week and all future weeks will be regenerated (past weeks stay untouched). Training debts are preserved.")) regenerateStructure();
+  });
+}
+
+function renderTeam(){
+  var v=document.getElementById("cts-view-team");
+  var h="";
+  if(!S.employees.length){ h+='<div class="cts-empty">No employees yet.</div>'; }
+  else{
+    h+='<div class="cts-boardwrap"><table class="cts-admin"><thead><tr><th>Employee</th>';
+    S.tasks.forEach(function(t){ h+='<th>'+esc(t.name)+(t.type==="we"?' <span class="cts-wetag">WE</span>':"")+'</th>'; });
+    if(admin) h+='<th></th>';
+    h+='</tr></thead><tbody>';
+    S.employees.forEach(function(e){
+      h+='<tr><td style="white-space:nowrap">'+avatar(e);
+      if(admin){
+        h+=' <input value="'+esc(e.name)+'" data-cts-ename="'+e.id+'" style="width:110px">'
+         +' <label class="cts-btn cts-btn-sm" style="display:inline-block">\uD83D\uDCF7<input type="file" accept="image/*" class="cts-photo-in" data-cts-photo="'+e.id+'"></label>'
+         +(e.photo?' <button class="cts-btn cts-btn-sm cts-btn-danger" data-cts-delphoto="'+e.id+'" title="Remove picture">\u00D7</button>':"")
+         +'<br><select data-cts-role="'+e.id+'" style="margin-top:4px"><option value=""'+(e.role===""?" selected":"")+'>Collaborator</option>'
+         +'<option value="tl"'+(e.role==="tl"?" selected":"")+'>Team Leader</option>'
+         +'<option value="mgr"'+(e.role==="mgr"?" selected":"")+'>Manager</option></select>'
+         +(isLeader(e)?' <button class="cts-btn cts-btn-sm '+(e.escalated?"cts-btn-danger":"")+'" data-cts-esc="'+e.id+'">'
+           +(e.escalated?"De-escalate":"Escalate")+'</button>':"");
+      } else {
+        h+=' '+esc(e.name)+roleTag(e);
+      }
+      h+='</td>';
+      S.tasks.forEach(function(t){
+        var lvl=skillOf(e,t.id);
+        if(admin){
+          h+='<td><span class="cts-lvlbtns">';
+          for(var l=1;l<=4;l++) h+='<button class="cts-lvl'+(l===lvl?" cts-sel":"")+'" data-cts-skill="'+e.id+'|'+t.id+'|'+l+'" title="'+(l===1?'Level 1 = CANNOT do this position at all \u2014 never assigned, never escalated':'Level '+l)+'">'+l+'</button>';
+          h+='</span></td>';
+        } else {
+          var done=hist(e.id,t.id);
+          h+='<td>'+pips(lvl)+(done?' <span style="font-family:var(--cts-mono);font-size:10px;color:var(--cts-mut)">\u00D7'+done+'</span>':"")+'</td>';
+        }
+      });
+      if(admin) h+='<td><button class="cts-btn cts-btn-sm cts-btn-danger" data-cts-delemp="'+e.id+'">Remove</button></td>';
+      h+='</tr>';
+    });
+    h+='</tbody></table></div>';
+  }
+  if(admin){
+    h+='<div class="cts-formrow"><input id="cts-newemp" placeholder="New employee name" style="width:200px">'
+     +'<button class="cts-btn" id="cts-addemp">Add employee</button></div>';
+  }
+  h+='<div class="cts-note">Levels: <b>1 = cannot do the task</b> \u00B7 2 = can run with support \u00B7 3 = autonomous \u00B7 4 = expert / can train. Level-1 people are never assigned to a position \u2014 not even as development picks; the only path from 1 to 2 is a <b>Training-tagged</b> position (Positions tab). The \u00D7n counter includes imported past schedules \u2014 use it to decide when to raise a level.<br><br><b>Specialist balance:</b> when only a few people hold the level a task demands, the workload for that task is balanced <b>among those capable people</b> \u2014 the scheduler rotates it fairly within the group instead of comparing them against colleagues who cannot do it. Escalated Team Leaders / Managers covering a specialist task are likewise rotated among themselves.<br><br><b>Team Leaders and Managers</b> are outside the workload balance: the scheduler never assigns them and they never appear in the workload panel. When <b>escalated</b>, they become assignable as last-resort cover \u2014 their assignments relieve the collaborators\u2019 load but still count for nobody\u2019s balance, accrue no debt, and stay listed outside the workload bars.<br><br><b>Collaborator sign-in</b> (top right) uses the names on this tab. The default password for everyone is <b>colab</b>; each collaborator is forced to set their own on first sign-in. Signed-in collaborators see only their own change requests.</div>';
+  v.innerHTML=h;
+  if(!admin) return;
+  v.querySelectorAll("[data-cts-skill]").forEach(function(b){ b.addEventListener("click",function(){
+    var p=this.getAttribute("data-cts-skill").split("|");
+    var e=empById(p[0]); if(!e) return;
+    e.skills[p[1]]=+p[2]; save(); renderTeam();
+    if(+p[2]===1){ var tt=taskById(p[1]);
+      toast(e.name+" set to level 1 on "+(tt?tt.name:"the task")+" \u2014 CANNOT do this position at all, not even via escalation"); } }); });
+  v.querySelectorAll("[data-cts-ename]").forEach(function(i){ i.addEventListener("change",function(){
+    var e=empById(this.getAttribute("data-cts-ename")); if(e){ e.name=this.value.trim()||e.name; save(); } }); });
+  v.querySelectorAll("[data-cts-delemp]").forEach(function(b){ b.addEventListener("click",function(){
+    var id=this.getAttribute("data-cts-delemp");
+    S.employees=S.employees.filter(function(e){return e.id!==id;});
+    S.absences=S.absences.filter(function(a){return a.empId!==id;});
+    delete S.history[id]; save(); renderTeam(); }); });
+  var add=document.getElementById("cts-addemp");
+  if(add) add.addEventListener("click",function(){
+    var n=document.getElementById("cts-newemp").value.trim(); if(!n) return;
+    S.employees.push({id:uid(),name:n,skills:{},role:"",escalated:false,pwHash:null,photo:null}); save(); renderTeam(); });
+  v.querySelectorAll("[data-cts-photo]").forEach(function(inp){
+    inp.addEventListener("change",function(){
+      var e=empById(this.getAttribute("data-cts-photo")); var f=this.files&&this.files[0];
+      if(!e||!f) return;
+      var rd=new FileReader();
+      rd.onload=function(){
+        var img=new Image();
+        img.onload=function(){
+          try{
+            var c=document.createElement("canvas"); c.width=64; c.height=64;
+            var x=c.getContext("2d");
+            var s=Math.min(img.width,img.height);
+            x.drawImage(img,(img.width-s)/2,(img.height-s)/2,s,s,0,0,64,64);
+            e.photo=c.toDataURL("image/jpeg",0.72);
+            save(); renderTeam(); renderColabSlot(); toast("Picture saved");
+          }catch(err){ toast("Could not process the image"); }
+        };
+        img.src=rd.result;
+      };
+      rd.readAsDataURL(f);
+    });
+  });
+  v.querySelectorAll("[data-cts-delphoto]").forEach(function(b){ b.addEventListener("click",function(){
+    var e=empById(this.getAttribute("data-cts-delphoto")); if(e){ e.photo=null; save(); renderTeam(); } }); });
+  v.querySelectorAll("[data-cts-role]").forEach(function(s){ s.addEventListener("change",function(){
+    var e=empById(this.getAttribute("data-cts-role")); if(!e) return;
+    e.role=this.value; if(!isLeader(e)) e.escalated=false;
+    if(isLeader(e)){ delete S.carry[e.id]; delete S.carryWe[e.id]; }
+    save(); renderTeam(); }); });
+  v.querySelectorAll("[data-cts-esc]").forEach(function(b){ b.addEventListener("click",function(){
+    var e=empById(this.getAttribute("data-cts-esc")); if(!e||!isLeader(e)) return;
+    e.escalated=!e.escalated; save(); renderTeam();
+    toast(e.escalated? e.name+" escalated \u2014 assignable as last-resort cover" : e.name+" back to leadership-only"); }); });
+}
+
+function renderTasks(){
+  var v=document.getElementById("cts-view-tasks");
+  var h="";
+  if(!S.tasks.length) h+='<div class="cts-empty">No positions yet.</div>';
+  else{
+    h+='<div class="cts-boardwrap"><table class="cts-admin"><thead><tr><th>Rank</th><th>Position</th><th>Type</th><th>Min level</th><th>Staffing</th><th>Days</th>';
+    if(admin) h+='<th></th>';
+    h+='</tr></thead><tbody>';
+    tasksByRank().forEach(function(t){
+      h+='<tr><td>'+(admin?'<input type="number" min="1" max="99" value="'+(t.rank||1)+'" data-cts-rank="'+t.id+'" style="width:52px">'
+        :'<span style="font-family:var(--cts-mono)">#'+(t.rank||"?")+'</span>')+'</td>';
+      h+='<td>'+(admin?'<input value="'+esc(t.name)+'" data-cts-tname="'+t.id+'" style="width:150px">':esc(t.name))+'</td>';
+      h+='<td>'+(t.type==="we"?'<span class="cts-wetag">Weekend</span>':'Weekday')+'</td>';
+      if(admin){
+        h+='<td><span class="cts-lvlbtns">';
+        for(var l=2;l<=4;l++) h+='<button class="cts-lvl'+(l===t.minLevel?" cts-sel":"")+'" data-cts-min="'+t.id+'|'+l+'">'+l+'</button>';
+        h+='</span></td>';
+        if(t.type==="we"){
+          h+='<td style="font-family:var(--cts-mono);font-size:12px">Early + Late + Mid</td><td style="font-family:var(--cts-mono);font-size:12px">Sat Sun</td>';
+        } else {
+          h+='<td><input type="number" min="1" max="6" value="'+t.slots+'" data-cts-slots="'+t.id+'" style="width:58px"> /day</td><td><span class="cts-daychecks">';
+          for(var d=0;d<7;d++) h+='<button class="cts-daychk'+(t.days.indexOf(d)>-1?" cts-sel":"")+'" data-cts-day="'+t.id+'|'+d+'">'+DAY_NAMES[d].charAt(0)+'</button>';
+          h+='</span></td>';
+        }
+        h+='<td><button class="cts-btn cts-btn-sm" data-cts-opt="'+t.id+'" title="Core positions are ALWAYS filled first. Suggest positions are staffed only when spare people remain \u2014 skipping them is never an insufficiency">'
+         +(t.optional?'\uD83D\uDCA1 Suggest':'Core')+'</button> '
+         +'<button class="cts-btn cts-btn-sm" data-cts-bal="'+t.id+'" title="Toggle whether this position counts in the workload balance">'
+         +(t.balance!==false?'\u2696 Balanced':(t.type==="we"?'Weekend extra':'Extra'))+'</button> '
+         +'<button class="cts-btn cts-btn-sm" data-cts-noesc="'+t.id+'" title="When workforce is short, leadership is NOT pulled onto this position \u2014 it stays unfilled instead">'
+         +(t.noEscalation?'No esc \u2713':'No esc')+'</button> '
+         +'<button class="cts-btn cts-btn-sm '+(t.training?"cts-btn-amber":"")+'" data-cts-trtag="'+t.id+'">'
+         +(t.training?"Training \u2713":"Tag training")+'</button> '
+         +'<button class="cts-btn cts-btn-sm cts-btn-danger" data-cts-deltask="'+t.id+'">Remove</button></td>';
+      } else {
+        h+='<td>L'+t.minLevel+'</td><td>'+(t.type==="we"?"3 shifts":t.slots+"/day")+'</td>'
+         +'<td style="font-family:var(--cts-mono);font-size:12px">'
+         +(t.type==="we"?"Sat Sun":t.days.map(function(d){return DAY_NAMES[d];}).join(" "))
+         +(t.optional?' <span class="cts-baltag cts-offbal" style="border-style:dashed">Suggest</span>':"")
+         +(t.training?' <span class="cts-trtag">Training</span>':"")
+         +(t.balance===false?' <span class="cts-baltag cts-offbal">Extra</span>':' <span class="cts-baltag cts-onbal">\u2696</span>')
+         +(t.noEscalation?' <span class="cts-noesctag">no esc</span>':"")+'</td>';
+      }
+      h+='</tr>';
+      if(t.training){
+        var sess=(t.training.sessions||[]).slice().sort(function(a,b){return a.date<b.date?-1:1;});
+        h+='<tr><td colspan="'+(admin?7:6)+'"><div class="cts-trconf">';
+        if(!sess.length) h+='<div class="cts-note" style="margin:0 0 6px">No training sessions scheduled yet.'+(admin?' Add one below \u2014 it will appear on that exact day on the Board.':'')+'</div>';
+        sess.forEach(function(s2){
+          var trE=empById(s2.trainerId);
+          h+='<div class="cts-formrow" style="margin:2px 0"><span style="font-family:var(--cts-mono);font-size:12px">'+esc(s2.date)+'</span>'
+           +'<span class="cts-role cts-role-trainer">trainer</span> '+esc(trE?trE.name:"\u2014")
+           +' <span class="cts-role cts-role-trainee">trainees</span> '
+           +(s2.traineeIds||[]).map(function(id){var e2=empById(id);return e2?esc(e2.name):"";}).filter(Boolean).join(", ")
+           +(admin?' <button class="cts-btn cts-btn-sm cts-btn-danger" data-cts-delsess="'+t.id+'|'+s2.id+'">\u00D7</button>':"")
+           +'</div>';
+        });
+        if(admin){
+          var st=trStage[t.id]||(trStage[t.id]={date:S.weekStart,trainerId:"",traineeIds:[]});
+          h+='<div class="cts-formrow" style="margin-top:8px;border-top:1px solid var(--cts-line);padding-top:8px">'
+           +'<input type="date" value="'+esc(st.date)+'" data-cts-sessdate="'+t.id+'">'
+           +'<select data-cts-sesstrainer="'+t.id+'"><option value="">trainer\u2026</option>';
+          S.employees.forEach(function(e){
+            h+='<option value="'+e.id+'"'+(st.trainerId===e.id?" selected":"")+'>'+esc(e.name)+'</option>'; });
+          h+='</select><span class="cts-emppick">';
+          S.employees.forEach(function(e){
+            if(e.id===st.trainerId) return;
+            var on=st.traineeIds.indexOf(e.id)>-1;
+            h+='<button class="cts-empchk'+(on?" cts-sel":"")+'" data-cts-sesstrainee="'+t.id+'|'+e.id+'">'+esc(e.name)+'</button>';
+          });
+          h+='</span><button class="cts-btn cts-btn-sm cts-btn-primary" data-cts-addsess="'+t.id+'">Add session</button></div>';
+        }
+        h+='</div></td></tr>';
+      }
+    });
+    h+='</tbody></table></div>';
+  }
+  if(admin){
+    h+='<div class="cts-formrow"><input id="cts-newtask" placeholder="New position name" style="width:180px">'
+     +'<select id="cts-newtasktype"><option value="wk">Weekday position</option><option value="we">Weekend position (Early+Late+Mid)</option></select>'
+     +'<button class="cts-btn" id="cts-addtask">Add position</button></div>'
+     +'<div class="cts-formrow"><label style="font-size:12px;color:var(--cts-mut)">Training intensity</label>'
+     +'<input type="range" min="0" max="100" value="'+Math.round(S.trainingRate*100)+'" id="cts-train">'
+     +'<span class="cts-weeklabel" id="cts-trainval">'+Math.round(S.trainingRate*100)+'%</span></div>'
+     +'<div class="cts-note">Weekend positions run Saturday and Sunday with three shifts: <b>Early</b> and <b>Late</b> are complementary (together they cover the day) and <b>Mid</b> bridges the handover. <b>Each shift is held by ONE person for the whole weekend</b> \u2014 whoever takes Early works Early on both Saturday and Sunday, and the same for Late and Mid. Per-day splits happen only as a fallback when nobody can cover both days. Nobody takes two shifts on the same day.<br><br><b>Rest rules (always enforced, weekend-anchored):</b> if you <b>don\u2019t work the weekend, Saturday and Sunday ARE your days off</b> \u2014 there is no weekday rest entitlement and you can be scheduled on all five weekdays. If you <b>do work the weekend, the compensation lands in the FOLLOWING week</b>: a hard cap of 5 worked days that week guarantees at least 2 days off after the worked weekend \u2014 they may be split, and an off next-weekend counts as the compensation too. On top of everything: nobody ever works more than <b>6 consecutive days</b>, counted over the totality of weekday and weekend work. The scheduler tracks owed recuperation and prefers to place those off-days early in the week. If the rules make a slot unstaffable, the board reports <b>WORKFORCE INSUFFICIENT</b> instead of silently breaking them.<br><br><b>\u2696 Balanced vs Extra:</b> only positions marked <b>Balanced</b> feed the workload balances. <b>The weekend is ONE coverage unit:</b> exactly <b>three collaborators</b> work it \u2014 one Early, one Mid, one Late \u2014 the <b>same three people on Saturday and Sunday</b> (one per shift per day), and together they <b>cover every other position</b>: nothing else is staffed on weekends. The highest-priority weekend position is the coverage unit; any other position simply shows \u201Cweekend team\u201D on Sat/Sun.<br><br><b>Weekday and weekend balances are STRICTLY separate \u2014 and measured in different units.</b> Weekdays balance <b>workload</b> (assignments vs availability-weighted fair share). Weekends balance <b>how many WEEKENDS each collaborator works per month</b> \u2014 a Sat+Sun pair counts as one weekend, tallied month-to-date in the panel and carried across months by its own ledger. Separate counters, separate carry, no scoring term ever reads the other side. <b>Rest rules are the one thing counted over the TOTALITY of worked days</b>: the 6-in-a-row limit, the 10-in-any-14 window and recuperation all count weekday and weekend work together \u2014 a body only has one calendar. Positions toggled to <b>Extra</b> / <b>Weekend extra</b> (projects, workshops, side duties\u2026) are levelled among themselves outside both balances and appear in a footnote.<br><br><b>No esc tag:</b> positions tagged \u201Cno mandatory escalation\u201D are never staffed by escalated Team Leaders / Managers \u2014 when workforce runs short, they deliberately stay UNFILLED (marked as \u201Cleft unfilled by design\u201D) so leadership capacity is reserved for the positions that truly require cover.<br><br><b>Priority ranks &amp; Suggest:</b> the <b>Rank</b> column is the fill order \u2014 rank 1 is staffed first, ALWAYS. Positions toggled to <b>\uD83D\uDCA1 Suggest</b> are proposed only when spare people remain after every Core position is covered; when nobody is spare they are skipped cleanly (grey \u201Cno spare\u201D, listed as skipped suggestions) and never trigger WORKFORCE INSUFFICIENT. Leadership is never escalated for a Suggest position.<br><br><b>Training tag (per-day sessions):</b> a tagged position leaves the normal rotation and is driven by <b>sessions</b>: pick the exact date, the trainer and the trainees \u2014 the session then appears on that day on the Board and Month calendar. Participants are locked out of everything else that day with <b>zero workload</b>; the carry ledger marks them \u201Cbehind\u201D and compensates afterwards. Adding a session inside an already-generated week raises the Structure banner \u2014 one click adapts the schedules.<br><br><b>Balance is a goal, not a gate.</b> The scheduler always produces the fullest schedule the hard rules allow (skills, absences, rest); when vacations or missing people make weekly balance impossible, the imbalance is written to a signed <b>carry ledger</b> (\u201Cbehind\u201D / \u201Cahead\u201D in the workload panels) and compensated over the following weeks and months. Fair share is availability-weighted, so vacation days never create work-debt.<br><br>Adding, removing or reconfiguring positions after schedules exist raises a <b>Structure changed</b> banner on the Board with a one-click regeneration of the current and future weeks.</div>';
+  }
+  v.innerHTML=h;
+  if(!admin) return;
+  v.querySelectorAll("[data-cts-min]").forEach(function(b){ b.addEventListener("click",function(){
+    var p=this.getAttribute("data-cts-min").split("|"); var t=taskById(p[0]); if(t){ t.minLevel=+p[1]; save(); renderTasks(); } }); });
+  v.querySelectorAll("[data-cts-day]").forEach(function(b){ b.addEventListener("click",function(){
+    var p=this.getAttribute("data-cts-day").split("|"); var t=taskById(p[0]); if(!t||t.type==="we") return;
+    var d=+p[1], ix=t.days.indexOf(d); if(ix>-1) t.days.splice(ix,1); else t.days.push(d);
+    t.days.sort(); save(); renderTasks(); }); });
+  v.querySelectorAll("[data-cts-slots]").forEach(function(i){ i.addEventListener("change",function(){
+    var t=taskById(this.getAttribute("data-cts-slots")); if(t){ t.slots=Math.max(1,Math.min(6,+this.value||1)); save(); } }); });
+  v.querySelectorAll("[data-cts-tname]").forEach(function(i){ i.addEventListener("change",function(){
+    var t=taskById(this.getAttribute("data-cts-tname")); if(t){ t.name=this.value.trim()||t.name; save(); } }); });
+  v.querySelectorAll("[data-cts-deltask]").forEach(function(b){ b.addEventListener("click",function(){
+    var id=this.getAttribute("data-cts-deltask"); S.tasks=S.tasks.filter(function(t){return t.id!==id;}); save(); renderTasks(); }); });
+  v.querySelectorAll("[data-cts-bal]").forEach(function(b){ b.addEventListener("click",function(){
+    var t=taskById(this.getAttribute("data-cts-bal")); if(!t) return;
+    t.balance=(t.balance===false); save(); renderTasks();
+    toast(t.balance? t.name+" now counts in the workload balance" : t.name+" is now an EXTRA position \u2014 outside the balance"); }); });
+  v.querySelectorAll("[data-cts-noesc]").forEach(function(b){ b.addEventListener("click",function(){
+    var t=taskById(this.getAttribute("data-cts-noesc")); if(!t) return;
+    t.noEscalation=!t.noEscalation; save(); renderTasks();
+    toast(t.noEscalation? t.name+" tagged \u201Cno mandatory escalation\u201D \u2014 leadership will never be pulled onto it"
+                        : t.name+" can now be covered by escalated leadership when workforce is short"); }); });
+  v.querySelectorAll("[data-cts-rank]").forEach(function(i){ i.addEventListener("change",function(){
+    var t=taskById(this.getAttribute("data-cts-rank")); if(!t) return;
+    t.rank=Math.max(1,Math.min(99,+this.value||1)); save(); renderTasks(); }); });
+  v.querySelectorAll("[data-cts-opt]").forEach(function(b){ b.addEventListener("click",function(){
+    var t=taskById(this.getAttribute("data-cts-opt")); if(!t) return;
+    t.optional=!t.optional; save(); renderTasks();
+    toast(t.optional? t.name+" is now a SUGGEST position \u2014 staffed only with spare people, after all Core positions"
+                    : t.name+" is now CORE \u2014 always filled first"); }); });
+  v.querySelectorAll("[data-cts-trtag]").forEach(function(b){ b.addEventListener("click",function(){
+    var t=taskById(this.getAttribute("data-cts-trtag")); if(!t) return;
+    if(t.training){
+      if(!confirm("Remove the training tag and all its sessions? The position returns to normal rotation; carry-ledger effects remain.")) return;
+      t.training=null;
+    } else {
+      t.training={sessions:[]};
+    }
+    save(); renderTasks(); }); });
+  v.querySelectorAll("[data-cts-sessdate]").forEach(function(i){ i.addEventListener("change",function(){
+    var id=this.getAttribute("data-cts-sessdate"); trStage[id]=trStage[id]||{date:"",trainerId:"",traineeIds:[]};
+    trStage[id].date=this.value; }); });
+  v.querySelectorAll("[data-cts-sesstrainer]").forEach(function(s2){ s2.addEventListener("change",function(){
+    var id=this.getAttribute("data-cts-sesstrainer"); trStage[id]=trStage[id]||{date:S.weekStart,trainerId:"",traineeIds:[]};
+    trStage[id].trainerId=this.value;
+    trStage[id].traineeIds=trStage[id].traineeIds.filter(function(x){return x!==this.value;},this);
+    renderTasks(); }); });
+  v.querySelectorAll("[data-cts-sesstrainee]").forEach(function(b){ b.addEventListener("click",function(){
+    var p=this.getAttribute("data-cts-sesstrainee").split("|");
+    var st=trStage[p[0]]=trStage[p[0]]||{date:S.weekStart,trainerId:"",traineeIds:[]};
+    var ix=st.traineeIds.indexOf(p[1]);
+    if(ix>-1) st.traineeIds.splice(ix,1); else st.traineeIds.push(p[1]);
+    renderTasks(); }); });
+  v.querySelectorAll("[data-cts-addsess]").forEach(function(b){ b.addEventListener("click",function(){
+    var id=this.getAttribute("data-cts-addsess");
+    var t=taskById(id), st=trStage[id];
+    if(!t||!t.training||!st) return;
+    if(!st.date){ toast("Pick the session date"); return; }
+    if(!st.trainerId){ toast("Pick the trainer"); return; }
+    if(!st.traineeIds.length){ toast("Pick at least one trainee"); return; }
+    t.training.sessions=t.training.sessions||[];
+    t.training.sessions.push({id:uid(), date:st.date, trainerId:st.trainerId, traineeIds:st.traineeIds.slice()});
+    trStage[id]={date:st.date,trainerId:st.trainerId,traineeIds:[]};
+    save(); renderTasks();
+    toast("Session added \u2014 it appears on "+st.date+" on the Board (adapt/regenerate if that week already exists)"); }); });
+  v.querySelectorAll("[data-cts-delsess]").forEach(function(b){ b.addEventListener("click",function(){
+    var p=this.getAttribute("data-cts-delsess").split("|");
+    var t=taskById(p[0]); if(!t||!t.training) return;
+    t.training.sessions=(t.training.sessions||[]).filter(function(s2){return s2.id!==p[1];});
+    save(); renderTasks(); }); });
+  var at=document.getElementById("cts-addtask");
+  if(at) at.addEventListener("click",function(){
+    var n=document.getElementById("cts-newtask").value.trim(); if(!n) return;
+    var ty=document.getElementById("cts-newtasktype").value;
+    var nextRank=S.tasks.reduce(function(m,t){return Math.max(m,t.rank||0);},0)+1;
+    S.tasks.push(ty==="we" ? {id:uid(),type:"we",name:n,minLevel:2,slots:1,days:[5,6],balance:true,training:null,rank:nextRank,optional:false,noEscalation:false}
+                           : {id:uid(),type:"wk",name:n,minLevel:2,slots:1,days:[0,1,2,3,4],balance:true,training:null,rank:nextRank,optional:false,noEscalation:false});
+    save(); renderTasks(); });
+  var tr=document.getElementById("cts-train");
+  if(tr) tr.addEventListener("input",function(){
+    S.trainingRate=+this.value/100; document.getElementById("cts-trainval").textContent=this.value+"%"; save(); });
+}
+
+function renderAbs(){
+  var v=document.getElementById("cts-view-abs");
+  var me=colab?empById(colab):null;
+  var h="";
+  if(!S.absences.length) h+='<div class="cts-empty">No absences recorded.</div>';
+  else{
+    h+='<div class="cts-boardwrap"><table class="cts-admin"><thead><tr><th>Employee</th><th>Type</th><th>From</th><th>To</th><th>Status</th><th>Justification</th>';
+    if(admin) h+='<th></th>'; h+='</tr></thead><tbody>';
+    S.absences.slice().sort(function(a,b){return a.from<b.from?-1:1;}).forEach(function(a){
+      var e=empById(a.empId);
+      var canSee = admin || (me && me.id===a.empId);
+      h+='<tr><td>'+esc(e?e.name:"?")+'</td><td><span class="cts-abschip cts-'+a.type+'">'+ABS_TYPES[a.type]+'</span></td>'
+       +'<td style="font-family:var(--cts-mono)">'+esc(a.from)+'</td><td style="font-family:var(--cts-mono)">'+esc(a.to)+'</td>'
+       +'<td><span class="cts-absstat cts-'+a.status+'">'+a.status+'</span></td><td>';
+      if(canSee){
+        if(a.justification) h+='<div class="cts-just">'+esc(a.justification)+'</div>';
+        (a.docs||[]).forEach(function(doc,di){
+          h+='<a class="cts-doclink" href="'+doc.data+'" download="'+esc(doc.name)+'" title="'+esc(doc.name)+'">\uD83D\uDCCE '+esc(doc.name)+'</a>';
+          if(admin || (me && me.id===a.empId && a.status==="pending"))
+            h+='<button class="cts-btn cts-btn-sm cts-btn-danger" data-cts-deldoc="'+a.id+'|'+di+'" title="Remove document">\u00D7</button>';
+        });
+        if(me && me.id===a.empId){
+          h+='<div style="margin-top:4px"><label class="cts-btn cts-btn-sm" style="display:inline-block">\uD83D\uDCCE attach<input type="file" class="cts-photo-in" data-cts-absdoc="'+a.id+'"></label>'
+           +' <button class="cts-btn cts-btn-sm" data-cts-absjust="'+a.id+'">justify</button></div>';
+        }
+        if(!a.justification && !(a.docs||[]).length && !(me && me.id===a.empId)) h+='<span class="cts-na">\u2014</span>';
+      } else {
+        h+='<span class="cts-na" title="Visible to the person and admins only">private</span>';
+      }
+      h+='</td>';
+      if(admin){
+        h+='<td style="white-space:nowrap">';
+        if(a.status==="pending")
+          h+='<button class="cts-btn cts-btn-sm cts-btn-primary" data-cts-absok="'+a.id+'">Approve</button> '
+           +'<button class="cts-btn cts-btn-sm cts-btn-amber" data-cts-absrej="'+a.id+'">Reject</button> ';
+        if(a.status==="rejected")
+          h+='<button class="cts-btn cts-btn-sm" data-cts-absok="'+a.id+'">Re-approve</button> ';
+        h+='<button class="cts-btn cts-btn-sm cts-btn-danger" data-cts-delabs="'+a.id+'">Remove</button></td>';
+      }
+      h+='</tr>';
+    });
+    h+='</tbody></table></div>';
+  }
+  // --- declaration forms ---
+  if(admin){
+    h+='<div class="cts-formrow"><select id="cts-absemp">';
+    S.employees.forEach(function(e){ h+='<option value="'+e.id+'">'+esc(e.name)+'</option>'; });
+    h+='</select><select id="cts-abstype"><option value="vac">Vacation</option><option value="sick">Sick</option><option value="oth">Other</option></select>'
+     +'<input type="date" id="cts-absfrom"><input type="date" id="cts-absto">'
+     +'<button class="cts-btn" id="cts-addabs">Add absence</button></div>';
+  }
+  if(me){
+    h+='<div class="cts-cardbox" style="margin-top:14px"><h3>Declare my absence \u2014 '+esc(me.name)+'</h3>'
+     +'<div class="cts-formrow"><select id="cts-myabstype"><option value="sick">Sick</option><option value="vac">Vacation</option><option value="oth">Other</option></select>'
+     +'<input type="date" id="cts-myabsfrom"><input type="date" id="cts-myabsto">'
+     +'</div><div class="cts-formrow"><input id="cts-myabsjust" placeholder="Justification (e.g. medical appointment, transport strike\u2026)" style="flex:1;min-width:200px">'
+     +'<label class="cts-btn" style="display:inline-block">\uD83D\uDCCE document<input type="file" class="cts-photo-in" id="cts-myabsdoc"></label>'
+     +'<span id="cts-myabsdocname" style="font-size:11px;color:var(--cts-mut)"></span>'
+     +'<button class="cts-btn cts-btn-primary" id="cts-myabssend">Declare</button></div>'
+     +'<div class="cts-note">You can declare <b>before</b> the day (planned absence) or <b>after</b> (justify a missed day \u2014 pick the past date). The declaration lands as <b>pending</b> until an admin reviews the justification; it already counts on the schedule so nobody is assigned in your place by mistake. Attach a supporting document (photo or PDF): images are compressed automatically, other files up to ~300&nbsp;KB.</div></div>';
+  } else if(!admin){
+    h+='<div class="cts-note" style="margin-top:12px">Sign in as a collaborator (top right) to declare and justify your own absences with supporting documents.</div>';
+  }
+  v.innerHTML=h;
+
+  /* ---- shared doc reader: images resized, other small files as-is ---- */
+  function readDoc(file, cb){
+    if(!file) return;
+    if(/^image\//.test(file.type)){
+      var rd=new FileReader();
+      rd.onload=function(){
+        var img=new Image();
+        img.onload=function(){
+          try{
+            var MAX=1000, sc=Math.min(1, MAX/Math.max(img.width,img.height));
+            var c=document.createElement("canvas");
+            c.width=Math.round(img.width*sc); c.height=Math.round(img.height*sc);
+            c.getContext("2d").drawImage(img,0,0,c.width,c.height);
+            cb({name:file.name, mime:"image/jpeg", data:c.toDataURL("image/jpeg",0.7)});
+          }catch(err){ toast("Could not process the image"); }
+        };
+        img.src=rd.result;
+      };
+      rd.readAsDataURL(file);
+    } else {
+      if(file.size>300*1024){ toast("File too large \u2014 keep documents under 300 KB (or send an image/photo)"); return; }
+      var rd2=new FileReader();
+      rd2.onload=function(){ cb({name:file.name, mime:file.type||"application/octet-stream", data:rd2.result}); };
+      rd2.readAsDataURL(file);
+    }
+  }
+  function absById(id){ for(var i=0;i<S.absences.length;i++) if(S.absences[i].id===id) return S.absences[i]; return null; }
+
+  // attach to an existing absence (owner)
+  v.querySelectorAll("[data-cts-absdoc]").forEach(function(inp){
+    inp.addEventListener("change",function(){
+      var a=absById(this.getAttribute("data-cts-absdoc")); var f=this.files&&this.files[0];
+      if(!a||!f) return;
+      if((a.docs||[]).length>=3){ toast("Maximum 3 documents per absence"); return; }
+      readDoc(f,function(doc){ a.docs=a.docs||[]; a.docs.push(doc); save(); renderAbs(); toast("Document attached"); });
+    });
+  });
+  v.querySelectorAll("[data-cts-deldoc]").forEach(function(b){ b.addEventListener("click",function(){
+    var p=this.getAttribute("data-cts-deldoc").split("|");
+    var a=absById(p[0]); if(!a||!a.docs) return;
+    a.docs.splice(+p[1],1); save(); renderAbs(); }); });
+  v.querySelectorAll("[data-cts-absjust]").forEach(function(b){ b.addEventListener("click",function(){
+    var a=absById(this.getAttribute("data-cts-absjust")); if(!a) return;
+    var j=prompt("Justification:", a.justification||"");
+    if(j===null) return;
+    a.justification=j.trim();
+    if(a.status==="rejected") a.status="pending";
+    save(); renderAbs(); }); });
+
+  // admin review + admin add + remove
+  v.querySelectorAll("[data-cts-absok]").forEach(function(b){ b.addEventListener("click",function(){
+    var a=absById(this.getAttribute("data-cts-absok")); if(a){ a.status="ok"; save(); renderAbs(); } }); });
+  v.querySelectorAll("[data-cts-absrej]").forEach(function(b){ b.addEventListener("click",function(){
+    var a=absById(this.getAttribute("data-cts-absrej")); if(!a) return;
+    if(confirm("Reject this justification? The absence stops counting on the schedule (regenerate or handle via change request if the week is already published).")){
+      a.status="rejected"; save(); renderAbs(); } }); });
+  v.querySelectorAll("[data-cts-delabs]").forEach(function(b){ b.addEventListener("click",function(){
+    var id=this.getAttribute("data-cts-delabs"); S.absences=S.absences.filter(function(a){return a.id!==id;}); save(); renderAbs(); }); });
+  var ad=document.getElementById("cts-addabs");
+  if(ad) ad.addEventListener("click",function(){
+    var eId=document.getElementById("cts-absemp").value;
+    var ty=document.getElementById("cts-abstype").value;
+    var f=document.getElementById("cts-absfrom").value, t=document.getElementById("cts-absto").value||f;
+    if(!eId||!f){ toast("Pick an employee and a start date"); return; }
+    if(t<f){ var tmp=f; f=t; t=tmp; }
+    S.absences.push({id:uid(),empId:eId,from:f,to:t,type:ty,status:"ok",justification:"",docs:[],declaredBy:"admin"});
+    save(); renderAbs(); });
+
+  // collaborator self-declaration
+  var pendingDoc=null;
+  var myDoc=document.getElementById("cts-myabsdoc");
+  if(myDoc) myDoc.addEventListener("change",function(){
+    var f=this.files&&this.files[0]; if(!f) return;
+    readDoc(f,function(doc){ pendingDoc=doc;
+      document.getElementById("cts-myabsdocname").textContent=doc.name; });
+  });
+  var mySend=document.getElementById("cts-myabssend");
+  if(mySend) mySend.addEventListener("click",function(){
+    var f=document.getElementById("cts-myabsfrom").value, t=document.getElementById("cts-myabsto").value||f;
+    if(!f){ toast("Pick the date(s)"); return; }
+    if(t<f){ var tmp=f; f=t; t=tmp; }
+    S.absences.push({id:uid(), empId:me.id, from:f, to:t,
+      type:document.getElementById("cts-myabstype").value,
+      status:"pending",
+      justification:document.getElementById("cts-myabsjust").value.trim(),
+      docs: pendingDoc?[pendingDoc]:[],
+      declaredBy:me.id});
+    save(); renderAbs(); toast("Absence declared \u2014 pending admin review");
+  });
+}
+
+/* ---------- Requests view ---------- */
+function renderReq(){
+  var v=document.getElementById("cts-view-req");
+  var sc=S.schedule, h="";
+  var me=colab?empById(colab):null;
+  if(!admin && !me){
+    v.innerHTML='<div class="cts-empty">Change requests are personal.<br>Sign in as a collaborator (top right) to file requests and see the status of yours \u2014 or unlock Admin to manage all of them.<br><br><button class="cts-btn cts-btn-primary" id="cts-req-signin">Collaborator sign-in</button></div>';
+    var sb=document.getElementById("cts-req-signin");
+    if(sb) sb.addEventListener("click",colabSignIn);
+    return;
+  }
+  // --- new request form ---
+  h+='<div class="cts-cardbox" style="margin-bottom:14px"><h3>Request a schedule change'+(me?' \u2014 as '+esc(me.name):"")+'</h3>';
+  if(!sc){ h+='<div class="cts-note">No active schedule to change yet.</div>'; }
+  else{
+    h+='<div class="cts-formrow"><select id="cts-req-slot">';
+    S.tasks.forEach(function(t){
+      for(var d=0;d<sc.days;d++){
+        var cell=sc.cells[t.id+"_"+d]||[];
+        cell.forEach(function(a,ix){
+          if(!a.empId || a.role || a.mergedFrom || a.mergedWith) return;   // training and merged desks are locked
+          var e=empById(a.empId); if(!e) return;
+          if(me && !admin && a.empId!==me.id) return;   // collaborators swap their own assignments
+          h+='<option value="'+t.id+'|'+d+'|'+a.empId+'|'+(a.shift||"")+'">'
+           +esc(t.name)+' \u00B7 '+DAY_NAMES[d]+' '+fmtShort(addDays(sc.weekStart,d))
+           +(a.shift?' \u00B7 '+shiftLabel(a.shift):"")+' \u2014 '+esc(e.name)+'</option>';
+        });
+      }
+    });
+    h+='</select><span style="color:var(--cts-mut);font-size:12px">replace with</span><select id="cts-req-new"><option value="">(admin decides)</option></select>'
+     +'</div><div class="cts-formrow">'
+     +(me?'':'<input id="cts-req-by" placeholder="Your name" style="width:140px">')
+     +'<input id="cts-req-why" placeholder="Reason (optional)" style="flex:1;min-width:180px">'
+     +'<button class="cts-btn cts-btn-primary" id="cts-req-send">Submit request</button></div>';
+  }
+  h+='</div>';
+  // --- request list (admins: all, collaborators: own) ---
+  var list=S.requests.filter(function(r){ return admin || (me && (r.requesterId===me.id)); });
+  if(!list.length) h+='<div class="cts-empty">'+(admin?"No change requests yet.":"You have no change requests yet.")+'</div>';
+  list.slice().reverse().forEach(function(r){
+    var t=taskById(r.taskId), ce=empById(r.currentEmpId), pe=r.proposedEmpId?empById(r.proposedEmpId):null, ae=r.altEmpId?empById(r.altEmpId):null;
+    h+='<div class="cts-req"><div class="cts-req-head"><span class="cts-status cts-'+r.status+'">'+r.status+'</span>'
+     +'<span class="cts-req-meta">'+esc(r.requester||"anonymous")+' \u00B7 week '+esc(r.weekStart)+' \u00B7 '+esc((r.ts||"").slice(0,10))+'</span></div>'
+     +'<div class="cts-req-body">Replace <b>'+esc(ce?ce.name:"?")+'</b> on <b>'+esc(t?t.name:"(deleted position)")+'</b> \u2014 '
+     +DAY_NAMES[r.day]+(r.shift?' \u00B7 '+shiftLabel(r.shift)+' shift':"")
+     +(pe?' \u2192 with <b>'+esc(pe.name)+'</b>':' \u2192 replacement left to admin')
+     +(r.reason?'<div class="cts-req-meta">Reason: '+esc(r.reason)+'</div>':"")
+     +(r.adminNote?'<div class="cts-req-meta">Admin: '+esc(r.adminNote)+(ae?' \u2014 proposes <b>'+esc(ae.name)+'</b>':"")+'</div>':"")
+     +'</div>';
+    if(admin && r.status==="pending"){
+      h+='<div class="cts-req-actions">';
+      if(pe) h+='<button class="cts-btn cts-btn-sm cts-btn-primary" data-cts-approve="'+r.id+'">Approve</button>';
+      h+='<select data-cts-altsel="'+r.id+'">'+(pe?'<option value="">alternative\u2026</option>':'<option value="">choose replacement\u2026</option>');
+      (function(){
+        var tt=taskById(r.taskId);
+        S.employees.forEach(function(e){
+          if(e.id===r.currentEmpId) return;
+          if(tt){
+            if(skillOf(e,tt.id)<2) return;                       // level 1 cannot do the position — not even escalated
+            if(isLeader(e) && !e.escalated) return;
+            if(isLeader(e) && (tt.noEscalation || tt.optional)) return;
+          }
+          h+='<option value="'+e.id+'">'+esc(e.name)+(tt?' \u2014 L'+skillOf(e,tt.id):"")+'</option>';
+        });
+      })();
+      h+='</select><button class="cts-btn cts-btn-sm cts-btn-amber" data-cts-alt="'+r.id+'">Suggest / apply alternative</button>'
+       +'<button class="cts-btn cts-btn-sm cts-btn-danger" data-cts-decline="'+r.id+'">Decline</button></div>';
+    }
+    if(r.status==="alt" && (admin || (me && r.requesterId===me.id))){
+      h+='<div class="cts-req-actions"><span style="font-size:12px;color:var(--cts-mut)">Counter-proposal pending \u2014 requester:</span>'
+       +'<button class="cts-btn cts-btn-sm cts-btn-primary" data-cts-acceptalt="'+r.id+'">Accept alternative</button>'
+       +'<button class="cts-btn cts-btn-sm cts-btn-danger" data-cts-refusealt="'+r.id+'">Refuse</button></div>';
+    }
+    h+='</div>';
+  });
+  v.innerHTML=h;
+
+  var send=document.getElementById("cts-req-send");
+  /* only people who CAN do the task are ever offered: level 1 = cannot do the
+     position at all — not even via escalation */
+  function eligibleReplacements(t, excludeId){
+    return S.employees.filter(function(e){
+      if(e.id===excludeId) return false;
+      if(skillOf(e,t.id)<2) return false;                 // level 1: never, full stop
+      if(isLeader(e) && !e.escalated) return false;
+      if(isLeader(e) && (t.noEscalation || t.optional)) return false;
+      return true;
+    });
+  }
+  function rebuildReplacementOptions(){
+    var slotEl=document.getElementById("cts-req-slot"), newEl=document.getElementById("cts-req-new");
+    if(!slotEl||!newEl) return;
+    var p=(slotEl.value||"").split("|"), t=taskById(p[0]);
+    var keep=newEl.value;
+    var hh='<option value="">(admin decides)</option>';
+    if(t) eligibleReplacements(t,p[2]).forEach(function(e){
+      hh+='<option value="'+e.id+'"'+(e.id===keep?" selected":"")+'>'+esc(e.name)+' \u2014 L'+skillOf(e,t.id)+'</option>'; });
+    newEl.innerHTML=hh;
+  }
+  var slotSel=document.getElementById("cts-req-slot");
+  if(slotSel){ slotSel.addEventListener("change",rebuildReplacementOptions); rebuildReplacementOptions(); }
+  if(send) send.addEventListener("click",function(){
+    var slotEl=document.getElementById("cts-req-slot");
+    var slot=slotEl?slotEl.value:""; if(!slot){ toast("No assignment selected"); return; }
+    var p=slot.split("|");
+    var byEl=document.getElementById("cts-req-by");
+    S.requests.push({id:uid(), ts:new Date().toISOString(),
+      requester: me? me.name : ((byEl&&byEl.value.trim())||spUser),
+      requesterId: me? me.id : null,
+      weekStart:S.schedule.weekStart, taskId:p[0], day:+p[1], currentEmpId:p[2], shift:p[3]||null,
+      proposedEmpId:document.getElementById("cts-req-new").value||null,
+      reason:document.getElementById("cts-req-why").value.trim(), status:"pending", adminNote:"", altEmpId:null});
+    save(); renderReq(); toast("Request submitted");
+  });
+  function req(id){ for(var i=0;i<S.requests.length;i++) if(S.requests[i].id===id) return S.requests[i]; return null; }
+  v.querySelectorAll("[data-cts-approve]").forEach(function(b){ b.addEventListener("click",function(){
+    var r=req(this.getAttribute("data-cts-approve")); if(!r||!r.proposedEmpId) return;
+    if(applyChange(r,r.proposedEmpId)){ r.status="approved"; save(); render(); toast("Change applied"); } }); });
+  v.querySelectorAll("[data-cts-alt]").forEach(function(b){ b.addEventListener("click",function(){
+    var id=this.getAttribute("data-cts-alt"); var r=req(id); if(!r) return;
+    var sel=v.querySelector('[data-cts-altsel="'+id+'"]'); var alt=sel?sel.value:"";
+    if(!alt){ toast("Pick the alternative person first"); return; }
+    var note=prompt("Note to the requester (optional):")||"";
+    if(!r.proposedEmpId){
+      // requester left the choice to admin: apply directly
+      r.altEmpId=alt; r.adminNote=note;
+      if(applyChange(r,alt)){ r.status="approved"; save(); render(); toast("Change applied"); }
+    } else {
+      r.altEmpId=alt; r.adminNote=note; r.status="alt"; save(); renderReq(); toast("Counter-proposal sent");
+    } }); });
+  v.querySelectorAll("[data-cts-decline]").forEach(function(b){ b.addEventListener("click",function(){
+    var r=req(this.getAttribute("data-cts-decline")); if(!r) return;
+    r.adminNote=prompt("Reason for declining (optional):")||r.adminNote;
+    r.status="declined"; save(); render(); }); });
+  v.querySelectorAll("[data-cts-acceptalt]").forEach(function(b){ b.addEventListener("click",function(){
+    var r=req(this.getAttribute("data-cts-acceptalt")); if(!r||!r.altEmpId) return;
+    if(applyChange(r,r.altEmpId)){ r.status="approved"; save(); render(); toast("Alternative applied"); } }); });
+  v.querySelectorAll("[data-cts-refusealt]").forEach(function(b){ b.addEventListener("click",function(){
+    var r=req(this.getAttribute("data-cts-refusealt")); if(!r) return; r.status="declined"; save(); render(); }); });
+}
+
+/* ---------- Ask AI view ---------- */
+
+
+/* ---------- Merges tab: which positions may merge, and in which order ---------- */
+function renderMerge(){
+  var v=document.getElementById("cts-view-merge");
+  var wkTasks=tasksByRank().filter(function(t){ return t.type!=="we" && !t.training; });
+  var h='<div class="cts-cardbox"><h3>Position merges</h3>'
+   +'<div class="cts-note" style="margin-top:6px">When a PRIORITY position is still unfilled after rotation and cascade redistribution, these rules are tried <b>top to bottom</b>: if the paired position is staffed that day by someone qualified for the unfilled one, the two positions become <b>ONE combined position \u201CA+B\u201D</b> on the board, held by that collaborator. A rule can also trigger a <b>task redistribution</b>: a third position of your choice is replaced that day by a <b>new position you name</b> (its expanded form) \u2014 same staffing, and its workload <b>keeps counting toward the original position\u2019s balance</b>. One merge per person per day; merged coverage adds no extra workload unit. Merges apply to weekday positions (weekends are the trio\u2019s).</div>';
+  if(!(S.merges||[]).length){
+    h+='<div class="cts-empty" style="margin-top:10px">No merge rules defined.'+(admin?' Add the first one below.':'')+'</div>';
+  } else {
+    h+='<table class="cts-admin" style="margin-top:10px"><thead><tr><th style="width:60px">Order</th><th>Position A</th><th>Position B</th><th>Task redistribution when merged</th>'+(admin?'<th></th>':'')+'</tr></thead><tbody>';
+    S.merges.forEach(function(m,ix){
+      var ta=taskById(m.a), tb=taskById(m.b);
+      h+='<tr><td style="font-family:var(--cts-mono)">'+(ix+1)
+       +(admin?' <button class="cts-btn cts-btn-sm" data-cts-mup="'+m.id+'" '+(ix===0?'disabled':'')+'>\u2191</button><button class="cts-btn cts-btn-sm" data-cts-mdn="'+m.id+'" '+(ix===S.merges.length-1?'disabled':'')+'>\u2193</button>':'')
+       +'</td><td>'+esc(ta?ta.name:"(removed)")+'</td><td>'+esc(tb?tb.name:"(removed)")+'</td>'
+       +'<td>'+(function(){
+          var tr2=m.replaceTask?taskById(m.replaceTask):null;
+          var shown=(tr2&&m.replaceName)
+            ? esc(tr2.name)+' <span class="cts-tag">\u2192 '+esc(m.replaceName)+'</span>'
+            : '<span class="cts-na">\u2014 none</span>';
+          if(!admin) return shown;
+          var ed='<div class="cts-formrow" style="margin-top:4px"><select data-cts-mrt="'+m.id+'"><option value="">(no redistribution)</option>';
+          tasksByRank().forEach(function(t3){
+            if(t3.type==="we"||t3.training||t3.id===m.a||t3.id===m.b) return;
+            ed+='<option value="'+t3.id+'"'+(m.replaceTask===t3.id?" selected":"")+'>'+esc(t3.name)+'</option>';
+          });
+          ed+='</select><input data-cts-mrn="'+m.id+'" value="'+esc(m.replaceName||"")+'" placeholder="runs as\u2026" style="width:120px">'
+            +'<button class="cts-btn cts-btn-sm" data-cts-mrsave="'+m.id+'">Set</button></div>';
+          return shown+ed;
+        })()+'</td>'
+       +(admin?'<td><button class="cts-btn cts-btn-sm cts-btn-danger" data-cts-mdel="'+m.id+'">Remove</button></td>':'')+'</tr>';
+    });
+    h+='</tbody></table>';
+  }
+  if(admin){
+    h+='<div class="cts-formrow" style="margin-top:12px;border-top:1px solid var(--cts-line);padding-top:10px">'
+     +'<select id="cts-merge-a"><option value="">Position A\u2026</option>';
+    wkTasks.forEach(function(t){ h+='<option value="'+t.id+'">'+esc(t.name)+'</option>'; });
+    h+='</select><span style="color:var(--cts-mut)">+</span><select id="cts-merge-b"><option value="">Position B\u2026</option>';
+    wkTasks.forEach(function(t){ h+='<option value="'+t.id+'">'+esc(t.name)+'</option>'; });
+    h+='</select><span style="color:var(--cts-mut);font-size:12px">\u2192 replaces</span><select id="cts-merge-rt"><option value="">(no redistribution)</option>';
+    wkTasks.forEach(function(t){ h+='<option value="'+t.id+'">'+esc(t.name)+'</option>'; });
+    h+='</select><span style="color:var(--cts-mut);font-size:12px">as</span><input id="cts-merge-name" placeholder="New position name" style="width:160px"><button class="cts-btn cts-btn-primary" id="cts-merge-add">Add merge rule</button></div>'
+     +'<div class="cts-note">Changing merge rules updates the structure fingerprint \u2014 adapt schedules from the Board banner.</div>';
+  }
+  h+='</div>';
+  v.innerHTML=h;
+  if(!admin) return;
+  var add=document.getElementById("cts-merge-add");
+  if(add) add.addEventListener("click",function(){
+    var a=document.getElementById("cts-merge-a").value, b=document.getElementById("cts-merge-b").value;
+    if(!a||!b){ toast("Pick both positions"); return; }
+    if(a===b){ toast("A position cannot merge with itself"); return; }
+    var dup=(S.merges||[]).some(function(m){ return (m.a===a&&m.b===b)||(m.a===b&&m.b===a); });
+    if(dup){ toast("That pair already has a rule"); return; }
+    var rt=document.getElementById("cts-merge-rt").value||null;
+    var rn=(document.getElementById("cts-merge-name").value||"").trim();
+    if(rt && !rn){ toast("Name the position that replaces it"); return; }
+    if(rt && (rt===a||rt===b)){ toast("The redistributed position must be a THIRD position, not one of the merging pair"); return; }
+    S.merges.push({id:uid(), a:a, b:b, replaceTask:rt, replaceName:rn||null});
+    save(); renderMerge(); toast("Merge rule added \u2014 adapt schedules from the Board banner");
+  });
+  v.querySelectorAll("[data-cts-mrsave]").forEach(function(bn){ bn.addEventListener("click",function(){
+    var id=this.getAttribute("data-cts-mrsave");
+    var m=null; for(var i4=0;i4<S.merges.length;i4++){ if(S.merges[i4].id===id){ m=S.merges[i4]; break; } }
+    if(!m) return;
+    var sel=v.querySelector('[data-cts-mrt="'+id+'"]'), inp=v.querySelector('[data-cts-mrn="'+id+'"]');
+    var rt=sel?sel.value||null:null, rn=inp?(inp.value||"").trim():"";
+    if(rt && !rn){ toast("Name the position that replaces it"); return; }
+    if(rt && (rt===m.a||rt===m.b)){ toast("Pick a THIRD position, not one of the merging pair"); return; }
+    m.replaceTask=rt; m.replaceName=rt?rn:null;
+    save(); renderMerge();
+    toast(rt?"Redistribution set \u2014 adapt schedules from the Board banner":"Redistribution removed"); }); });
+  v.querySelectorAll("[data-cts-mdel]").forEach(function(bn){ bn.addEventListener("click",function(){
+    var id=this.getAttribute("data-cts-mdel");
+    S.merges=S.merges.filter(function(m){return m.id!==id;});
+    save(); renderMerge(); }); });
+  v.querySelectorAll("[data-cts-mup]").forEach(function(bn){ bn.addEventListener("click",function(){
+    var id=this.getAttribute("data-cts-mup");
+    var ix=S.merges.findIndex? S.merges.findIndex(function(m){return m.id===id;}) : -1;
+    if(ix<0){ for(var i2=0;i2<S.merges.length;i2++){ if(S.merges[i2].id===id){ ix=i2; break; } } }
+    if(ix>0){ var t2=S.merges[ix-1]; S.merges[ix-1]=S.merges[ix]; S.merges[ix]=t2; save(); renderMerge(); } }); });
+  v.querySelectorAll("[data-cts-mdn]").forEach(function(bn){ bn.addEventListener("click",function(){
+    var id=this.getAttribute("data-cts-mdn");
+    var ix=-1; for(var i3=0;i3<S.merges.length;i3++){ if(S.merges[i3].id===id){ ix=i3; break; } }
+    if(ix>-1 && ix<S.merges.length-1){ var t3=S.merges[ix+1]; S.merges[ix+1]=S.merges[ix]; S.merges[ix]=t3; save(); renderMerge(); } }); });
+}
+
+/* ---------- Rules tab: the whole rulebook, tunables editable by admin ---------- */
+function renderRules(){
+  var v=document.getElementById("cts-view-rules");
+  var R=RULES();
+  var h='<div class="cts-cardbox"><h3>Configurable parameters</h3>';
+  if(admin){
+    h+='<div class="cts-formrow"><label style="font-size:12px;color:var(--cts-mut)">Max consecutive workdays</label>'
+     +'<input type="number" min="3" max="10" value="'+R.maxConsecutive+'" id="cts-rule-maxc" style="width:64px">'
+     +'<label style="font-size:12px;color:var(--cts-mut)">Max worked days in the week after a worked weekend</label>'
+     +'<input type="number" min="3" max="7" value="'+R.postWeekendCap+'" id="cts-rule-pwc" style="width:64px"></div>'
+     +'<div class="cts-formrow"><label style="font-size:12px;color:var(--cts-mut)">Training intensity</label>'
+     +'<input type="range" min="0" max="100" value="'+Math.round((S.trainingRate||0)*100)+'" id="cts-rule-tr">'
+     +'<span style="font-family:var(--cts-mono);font-size:12px" id="cts-rule-trv">'+Math.round((S.trainingRate||0)*100)+'%</span></div>'
+     +'<div class="cts-note">Changing a parameter updates the structure fingerprint \u2014 the Board shows the amber banner and one click adapts current + future weeks. Past weeks are never touched.</div>';
+  } else {
+    h+='<div class="cts-note">Max consecutive workdays: <b>'+R.maxConsecutive+'</b> \u00B7 Post-weekend week cap: <b>'+R.postWeekendCap+'</b> \u00B7 Training intensity: <b>'+Math.round((S.trainingRate||0)*100)+'%</b> \u2014 an admin can adjust these.</div>';
+  }
+  h+='</div>';
+
+  function sec(title, items){
+    h+='<div class="cts-cardbox" style="margin-top:12px"><h3>'+title+'</h3><ul style="margin:8px 0 2px 18px;padding:0;display:grid;gap:7px;font-size:13.5px;line-height:1.5">';
+    items.forEach(function(it){ h+='<li>'+it+'</li>'; });
+    h+='</ul></div>';
+  }
+  sec("Priority \u0026 positions",[
+    "Every position has a <b>rank</b>: rank 1 is filled first, ALWAYS. Core positions are never sacrificed for lower-priority ones \u2014 under scarcity, gaps land on the lowest rank.",
+    "<b>\uD83D\uDCA1 Suggest</b> positions are staffed only with people left over after every core position is covered. Skipping them is never an insufficiency and never escalates leadership.",
+    "<b>Extra</b> positions (balance off) are levelled among themselves, outside both workload balances.",
+    "<b>Position merges:</b> when a priority position stays unfilled even after redistribution, admin-defined merge rules (Merges tab, tried in order) let the collaborator on the paired position cover <b>both as one desk</b> \u2014 one merge per person per day, no extra workload unit.",
+    "<b>Cascade redistribution:</b> if the free collaborators can\u2019t do an unfilled position but a colleague assigned elsewhere that day CAN, the capable colleague is moved onto it and the free collaborator takes over the vacated position \u2014 priority work always lands on capable hands before any gap is declared.",
+    "Unstaffable PRIORITY slots trigger the red <b>WORKFORCE INSUFFICIENT</b> banner with per-slot reasons; balance never blocks production.",
+    "<b>Manual scheduling</b> (admin, current week): assign, replace or remove anyone on any slot from the Board \u2014 hard rules still enforced (level 1 never, absences, streak, post-weekend cap); weekend edits apply to both days; manual entries carry an <b>M</b> tag and are overwritten on regeneration."
+  ]);
+  sec("Skills",[
+    "Level <b>1 = cannot do the position AT ALL</b>: never assigned, never suggested as replacement, never covered via escalation. Training sessions are the only path from 1 to 2.",
+    "Positions require a minimum level of 2\u20134. Development picks (one level below the minimum, never below 2) may join alongside a qualified colleague, at the configured training intensity.",
+    "Specialist fairness: rotation is compared within the group of people CAPABLE of each position, so rare skills rotate among their holders."
+  ]);
+  sec("Weekend",[
+    "The weekend is <b>one coverage unit: exactly three collaborators</b> \u2014 one Early, one Mid, one Late \u2014 the <b>same trio on Saturday and Sunday</b> (one per shift per day). Per-day split only if nobody can hold a shift both days.",
+    "The trio <b>covers all other positions</b>: nothing else is staffed on weekends; other rows show \u201Cweekend team\u201D.",
+    "Weekend fairness is measured in <b>weekends per month</b> (a Sat+Sun pair = 1), with its own carry ledger across months.",
+    "A weekend swap through Requests always moves <b>both days together</b>."
+  ]);
+  sec("Rest \u0026 days off",[
+    "<b>Weekend not worked \u2192 Saturday and Sunday ARE the days off.</b> All five weekdays are workable. A collaborator with <b>no task on a weekday is an ALERT</b> \u2014 the board flags \u201C\u26A0 no task\u201d and a manual position must be given; it is never displayed as a day off.",
+    "<b>Weekday days off exist ONLY as compensation after a worked weekend \u2014 absolutely only.</b> The week after a worked weekend is hard-capped at "+R.postWeekendCap+" worked days; the compensation may be split and an off next-weekend counts.",
+    "Universal wall: never more than <b>"+R.maxConsecutive+" consecutive workdays</b>, counted over the totality of weekday + weekend work, across week boundaries.",
+    "The recup counter tracks owed compensation and rests those people early in the following week when coverage allows."
+  ]);
+  sec("Balance",[
+    "<b>Weekday and weekend balances are strictly separate</b> and use different units: weekday = workload vs availability-weighted fair share; weekend = number of weekends per month. No scoring term reads the other side.",
+    "<b>Balance is a goal, not a gate</b>: imbalances (vacations, training, missing people) go to signed carry ledgers (\u201Cbehind / ahead\u201D) and are compensated over the following weeks and months.",
+    "Vacation never creates work-debt: fair share is availability-weighted."
+  ]);
+  sec("Leadership",[
+    "Team Leaders and Managers are outside the rotation and all balances. When <b>escalated</b>, they join as last resort only, rotating among escalated leaders.",
+    "Positions tagged <b>No esc</b> stay unfilled rather than pulling leadership. Level 1 still blocks an escalated leader.",
+    "Escalation cover is footnoted under the workload panels."
+  ]);
+  sec("Training",[
+    "Training positions run as <b>per-day sessions</b>: date + trainer + trainees, visible on that exact day on the Board and Month calendar.",
+    "Participants are locked out of everything else that day with zero workload; the carry ledger compensates them afterwards.",
+    "Adding a session inside a generated week raises the Structure banner \u2014 one click adapts."
+  ]);
+  sec("Requests \u0026 absences",[
+    "Collaborators sign in to file requests on their OWN assignments; replacement lists only ever contain eligible people (level \u2265 2 on that position).",
+    "Admin can approve, decline with a note, or counter-propose; the owner accepts or refuses the counter-proposal.",
+    "Absences can be declared before or after the date with justification and up to 3 documents; pending declarations already count on the schedule; justification and documents stay private to the owner and admin."
+  ]);
+  v.innerHTML=h;
+  if(admin){
+    var mc=document.getElementById("cts-rule-maxc"), pw=document.getElementById("cts-rule-pwc"), tr=document.getElementById("cts-rule-tr");
+    if(mc) mc.addEventListener("change",function(){ S.rules.maxConsecutive=Math.max(3,Math.min(10,+this.value||6)); save(); renderRules(); toast("Rule updated \u2014 adapt schedules from the Board banner"); });
+    if(pw) pw.addEventListener("change",function(){ S.rules.postWeekendCap=Math.max(3,Math.min(7,+this.value||5)); save(); renderRules(); toast("Rule updated \u2014 adapt schedules from the Board banner"); });
+    if(tr) tr.addEventListener("input",function(){ S.trainingRate=(+this.value)/100; document.getElementById("cts-rule-trv").textContent=this.value+"%"; });
+    if(tr) tr.addEventListener("change",function(){ save(); });
+  }
+}
+
+function renderAI(){
+  var v=document.getElementById("cts-view-ai");
+  var h='<div class="cts-chatlog" id="cts-chatlog">';
+  if(!chat.length) h+='<div class="cts-empty">Ask anything about the board \u2014 e.g. \u201Cwho is most overloaded this month?\u201D, \u201Cwho never worked the weekend Mid shift?\u201D, \u201Cwhich position has the worst coverage?\u201D</div>';
+  chat.forEach(function(m){
+    h+='<div class="cts-msg cts-msg-'+m.role+'">'+esc(m.text)+'</div>';
+  });
+  h+='</div><div class="cts-askrow"><input id="cts-ask" placeholder="Ask about schedules, workload, skills, absences\u2026">'
+   +'<button class="cts-btn cts-btn-primary" id="cts-askbtn">Ask</button></div>';
+  if(admin){
+    h+='<div class="cts-formrow" style="margin-top:14px"><input id="cts-aikey" type="password" placeholder="Anthropic API key (kept in THIS browser only)" style="flex:1;min-width:220px" value="'+esc(getAiKey())+'">'
+     +'<button class="cts-btn" id="cts-savekey">Save key</button></div>';
+  }
+  h+='<div class="cts-note">The question is sent to the Claude API together with a compact snapshot of the board (team, skills, absences, current + recent archived schedules, requests). The API key never leaves this browser and is never included in the shared data or exports.</div>';
+  v.innerHTML=h;
+  var log=document.getElementById("cts-chatlog"); log.scrollTop=log.scrollHeight;
+  function fire(){
+    var inp=document.getElementById("cts-ask"); var q=inp.value.trim(); if(!q) return;
+    inp.value="";
+    chat.push({role:"q",text:q}); renderAI();
+    askAI(q).then(function(a){ chat.push({role:"a",text:a}); renderAI(); })
+    .catch(function(e){
+      chat.push({role:"e",text:"AI unavailable: "+e.message+(getAiKey()?"":" \u2014 no API key configured (admin can set one below the ask box).")});
+      renderAI();
+    });
+  }
+  document.getElementById("cts-askbtn").addEventListener("click",fire);
+  document.getElementById("cts-ask").addEventListener("keydown",function(ev){ if(ev.key==="Enter") fire(); });
+  var sk=document.getElementById("cts-savekey");
+  if(sk) sk.addEventListener("click",function(){
+    setAiKey(document.getElementById("cts-aikey").value.trim()); toast("API key saved locally"); });
+}
+
+/* ---------- Data view ---------- */
+function renderData(){
+  var v=document.getElementById("cts-view-data");
+  var h='<div class="cts-note" style="margin-bottom:10px">Rotation Board <span style="font-family:var(--cts-mono)">'+CTS_VERSION+'</span> \u00B7 shared list: <span style="font-family:var(--cts-mono)">'+SP_LIST+'</span></div>'
+   +'<div class="cts-cardbox" style="margin-bottom:14px"><h3>Backup / restore (JSON)</h3>'
+   +'<textarea class="cts-json" id="cts-jsonbox" spellcheck="false"></textarea>'
+   +'<div class="cts-formrow"><button class="cts-btn" id="cts-export">Export current data</button>';
+  if(admin) h+='<button class="cts-btn" id="cts-import">Import from box</button>'
+   +'<button class="cts-btn cts-btn-danger" id="cts-reset">Reset everything</button>';
+  h+='</div><div class="cts-note">When this page runs inside SharePoint, data is shared with the whole team through the <b>RotationBoardData</b> list (created automatically on first run). The header badge shows sync status; last write wins. The AI API key is never included.</div></div>';
+  h+='<div class="cts-cardbox" style="margin-bottom:14px"><h3>Schedule export (upload-compatible)</h3>'
+   +'<div class="cts-formrow"><select id="cts-expscope"><option value="week">Current week</option>'
+   +'<option value="month">Month in view ('+esc(viewMonth)+')</option>'
+   +'<option value="all">Everything (current + archive)</option></select>'
+   +'<select id="cts-expfmt"><option value="json">JSON records</option><option value="csv">CSV (Excel)</option></select>'
+   +'<button class="cts-btn cts-btn-primary" id="cts-expdl">Download file</button>'
+   +'<button class="cts-btn" id="cts-expbox">To copy box</button></div>'
+   +'<div class="cts-note">Both formats use the same layout as the \u201CImport past schedules\u201D box (date, task, employee, shift) \u2014 files exported here re-upload as-is, here or on any other Rotation Board. Use it to hand schedules to other teams or to keep monthly files in a document library.</div></div>';
+  if(admin){
+    h+='<div class="cts-cardbox" style="margin-bottom:14px"><h3>Import past schedules (years / months / days)</h3>'
+     +'<textarea class="cts-json" id="cts-pastbox" spellcheck="false" placeholder=\'{"records":[{"date":"2025-11-03","task":"Payments desk","employee":"Employee A"},{"date":"2025-11-08","task":"Weekend coverage","employee":"Employee B","shift":"MID"}]}\'></textarea>'
+     +'<div class="cts-formrow"><button class="cts-btn" id="cts-importpast">Import past schedules</button></div>'
+     +'<div class="cts-note">Three formats accepted: (1) native archive entries exported from this app; (2) JSON records \u2014 one entry per assignment with date, task name and employee name (optional shift S1/S2/MID); (3) CSV with header <b>date,task,employee,shift</b> \u2014 exactly what the Schedule export produces. Names must match the Team and Positions tabs. Imports feed the rotation history (\u00D7n counters) and appear in the Board week selector and Month view.</div></div>';
+    h+='<div class="cts-cardbox"><h3>Admin password</h3>'
+     +'<div class="cts-formrow"><input type="password" id="cts-newpw" placeholder="New admin password" style="width:220px">'
+     +'<button class="cts-btn" id="cts-setpw">Change password</button></div>'
+     +'<div class="cts-note">This gate stops accidental edits by colleagues in consultation mode. It is client-side protection only \u2014 anyone with edit rights on the SharePoint list itself could still modify the raw data, so keep list permissions tight if that matters.</div></div>';
+  }
+  v.innerHTML=h;
+  document.getElementById("cts-export").addEventListener("click",function(){
+    document.getElementById("cts-jsonbox").value=JSON.stringify(S,null,2); toast("Exported to box \u2014 copy it");
+  });
+  function expPayload(){
+    var scope=document.getElementById("cts-expscope").value;
+    var fmt=document.getElementById("cts-expfmt").value;
+    var recs=buildRecords(scope);
+    if(!recs.length){ toast("Nothing to export for that scope"); return null; }
+    var tag=scope==="week"?(S.schedule?S.schedule.weekStart:"week"):(scope==="month"?viewMonth:"all");
+    return fmt==="csv"
+      ? {name:"rotation-"+tag+".csv", text:toCSV(recs), mime:"text/csv"}
+      : {name:"rotation-"+tag+".json", text:JSON.stringify({records:recs},null,2), mime:"application/json"};
+  }
+  document.getElementById("cts-expdl").addEventListener("click",function(){
+    var p=expPayload(); if(p) downloadFile(p.name,p.text,p.mime);
+  });
+  document.getElementById("cts-expbox").addEventListener("click",function(){
+    var p=expPayload(); if(p){ document.getElementById("cts-jsonbox").value=p.text; toast("Export placed in the copy box"); }
+  });
+  if(!admin) return;
+  document.getElementById("cts-import").addEventListener("click",function(){
+    try{
+      var obj=JSON.parse(document.getElementById("cts-jsonbox").value);
+      if(!obj.employees||!obj.tasks) throw new Error("bad shape");
+      S=migrate(obj); save(); render(); toast("Data imported");
+    }catch(e){ toast("Import failed \u2014 invalid JSON"); }
+  });
+  document.getElementById("cts-reset").addEventListener("click",function(){
+    if(confirm("Reset all data? This clears employees, positions, absences, requests, archive and history.")){
+      S=defaultState(); save(); render(); toast("Reset done"); }
+  });
+  document.getElementById("cts-importpast").addEventListener("click",function(){
+    importPast(document.getElementById("cts-pastbox").value);
+  });
+  document.getElementById("cts-setpw").addEventListener("click",function(){
+    var pw=document.getElementById("cts-newpw").value;
+    if(pw.length<4){ toast("Use at least 4 characters"); return; }
+    sha256(pw).then(function(hh){ S.adminHash=hh; save(); toast("Admin password updated"); });
+  });
+}
+
+/* ---------- wiring ---------- */
+document.getElementById("cts-adminToggle").addEventListener("click",function(){
+  if(admin) lockAdmin(); else tryUnlockAdmin();
+});
+document.querySelectorAll("#cts-tabs .cts-tab").forEach(function(b){
+  b.addEventListener("click",function(){ activeTab=this.getAttribute("data-cts-tab"); render(); });
+});
+render();
+renderColabSlot();
+spLoad();
+})();
+</script>
+</body>
+</html>
