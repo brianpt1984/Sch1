@@ -1,0 +1,19 @@
+{
+  "name": "round-table",
+  "version": "1.0.0",
+  "description": "Live turn-based debate between Claude, GPT-4o, and Gemini over a shared market snapshot",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.30.0",
+    "@google/generative-ai": "^0.21.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "openai": "^4.67.0",
+    "uuid": "^10.0.0"
+  }
+}
