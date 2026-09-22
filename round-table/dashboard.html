@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Round Table — AI Market Debate</title>
+<style>
+:root {
+  --ink:    #0D1117;
+  --panel:  #161B22;
+  --card:   #1C2230;
+  --line:   #2D3748;
+  --text:   #E2E8F0;
+  --mut:    #718096;
+  --dim:    #4A5568;
+  --claude: #00C97D;
+  --claude-soft: rgba(0,201,125,.13);
+  --gpt:    #4A9EE0;
+  --gpt-soft: rgba(74,158,224,.13);
+  --gemini: #F6AD55;
+  --gemini-soft: rgba(246,173,85,.13);
+  --red:    #FC8181;
+  --mono: 'SF Mono', Consolas, 'Cascadia Code', Menlo, monospace;
+  --r6: 6px; --r10: 10px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--ink);color:var(--text);font-family:system-ui,-apple-system,sans-serif;
+     font-size:13px;line-height:1.5;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+
+/* ── Header ── */
+.rt-head{display:flex;align-items:center;gap:14px;padding:11px 18px;
+         background:var(--panel);border-bottom:1px solid var(--line);flex-shrink:0}
+.rt-logo{font-family:var(--mono);font-size:12px;font-weight:700;
+         color:var(--claude);letter-spacing:.06em;white-space:nowrap}
+.rt-logo b{color:var(--text)}
+.rt-status-wrap{display:flex;align-items:center;gap:6px;font-family:var(--mono);
+                font-size:10px;letter-spacing:.1em;color:var(--mut)}
+.rt-dot{width:7px;height:7px;border-radius:50%;background:var(--dim);flex-shrink:0}
+.rt-dot.live{background:var(--claude);box-shadow:0 0 6px var(--claude);animation:pulse 1.4s ease-in-out infinite}
+.rt-dot.converged{background:var(--gemini)}
+.rt-dot.error{background:var(--red)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
+.rt-head-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.rt-sess-label{font-family:var(--mono);font-size:10px;color:var(--dim);white-space:nowrap}
+.rt-btn{border:1px solid var(--line);background:var(--card);color:var(--text);
+        border-radius:var(--r6);padding:5px 12px;font-size:12px;cursor:pointer;
+        font-family:inherit;transition:border-color .12s,background .12s}
+.rt-btn:hover{border-color:var(--claude)}
+.rt-btn.primary{background:var(--claude);border-color:var(--claude);color:#052116;font-weight:600}
+.rt-btn.primary:hover{filter:brightness(1.1)}
+.rt-btn:disabled{opacity:.5;cursor:default;pointer-events:none}
+
+/* ── Layout ── */
+.rt-body{flex:1;display:flex;overflow:hidden}
+.rt-sidebar{width:272px;min-width:272px;background:var(--panel);border-right:1px solid var(--line);
+            display:flex;flex-direction:column;overflow:hidden}
+.rt-sidebar-scroll{flex:1;overflow-y:auto;overflow-x:hidden}
+.rt-sidebar-scroll::-webkit-scrollbar{width:4px}
+.rt-sidebar-scroll::-webkit-scrollbar-track{background:transparent}
+.rt-sidebar-scroll::-webkit-scrollbar-thumb{background:var(--line);border-radius:2px}
+
+/* ── Sidebar sections ── */
+.rt-sec{border-bottom:1px solid var(--line);padding:0}
+.rt-sec-head{display:flex;align-items:center;justify-content:space-between;
+             padding:9px 14px;font-family:var(--mono);font-size:9px;letter-spacing:.14em;
+             text-transform:uppercase;color:var(--dim);user-select:none}
+.rt-sec-head .rt-caret{font-size:8px;transition:transform .15s}
+.rt-sec-head.collapsed .rt-caret{transform:rotate(-90deg)}
+.rt-sec-body{padding:0 10px 10px}
+
+/* ── Session list ── */
+.rt-session-item{display:flex;align-items:center;gap:9px;padding:7px 10px 7px 6px;
+                 border-radius:var(--r6);cursor:pointer;transition:background .1s;margin-bottom:2px}
+.rt-session-item:hover{background:var(--card)}
+.rt-session-item.active{background:rgba(0,201,125,.08);outline:1px solid rgba(0,201,125,.2)}
+.rt-sess-dot{width:6px;height:6px;border-radius:50%;background:var(--dim);flex-shrink:0}
+.rt-sess-dot.fetching,.rt-sess-dot.debating{background:var(--claude)}
+.rt-sess-dot.converged{background:var(--gemini)}
+.rt-sess-dot.timeout{background:var(--mut)}
+.rt-sess-dot.error{background:var(--red)}
+.rt-sess-info{}
+.rt-sess-id{font-family:var(--mono);font-size:10px;color:var(--text)}
+.rt-sess-meta{font-size:10px;color:var(--mut)}
+
+/* ── Snapshot panel ── */
+.rt-snap-row{display:flex;align-items:center;justify-content:space-between;
+             padding:4px 4px;border-radius:4px}
+.rt-snap-row:hover{background:var(--card)}
+.rt-snap-sym{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--text);width:38px}
+.rt-snap-price{font-family:var(--mono);font-size:11px;color:var(--text);flex:1;text-align:right}
+.rt-snap-chg{font-family:var(--mono);font-size:10px;width:54px;text-align:right}
+.rt-snap-chg.pos{color:#68D391}.rt-snap-chg.neg{color:var(--red)}.rt-snap-chg.flat{color:var(--mut)}
+.rt-snap-poly{}
+.rt-snap-q{font-size:11px;color:var(--text);margin-top:6px;line-height:1.3}
+.rt-snap-pr{font-family:var(--mono);font-size:10px;color:var(--mut)}
+
+/* ── Consensus panel ── */
+.rt-con-empty{font-size:11px;color:var(--mut);padding:6px 4px;font-style:italic}
+.rt-con-box{border-radius:var(--r10);padding:12px;border:1px solid var(--line);background:var(--card)}
+.rt-con-box.bullish{border-color:var(--claude);background:var(--claude-soft)}
+.rt-con-box.bearish{border-color:var(--red);background:rgba(252,129,129,.08)}
+.rt-con-box.timeout{border-color:var(--mut)}
+.rt-con-label{font-family:var(--mono);font-size:9px;letter-spacing:.12em;color:var(--mut);margin-bottom:5px}
+.rt-con-call{font-size:16px;font-weight:700;margin-bottom:4px;letter-spacing:.03em}
+.rt-con-call.bullish{color:var(--claude)}.rt-con-call.bearish{color:var(--red)}.rt-con-call.neutral{color:var(--mut)}
+.rt-con-support{font-size:11px;color:var(--mut);margin-bottom:8px}
+.rt-con-thesis{font-size:11px;color:var(--text);line-height:1.4;border-top:1px solid var(--line);padding-top:8px}
+.rt-con-thesis p{margin-bottom:4px}
+.rt-con-thesis .rt-con-model{font-family:var(--mono);font-size:9px;letter-spacing:.08em;
+                              text-transform:uppercase;color:var(--mut);display:inline-block;margin-right:5px}
+
+/* ── Transcript ── */
+.rt-transcript-wrap{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.rt-transcript-head{display:flex;align-items:center;gap:10px;padding:8px 18px;
+                    background:var(--panel);border-bottom:1px solid var(--line);flex-shrink:0}
+.rt-transcript-title{font-family:var(--mono);font-size:10px;letter-spacing:.12em;
+                      text-transform:uppercase;color:var(--mut)}
+.rt-round-progress{display:flex;gap:5px;margin-left:auto}
+.rt-round-pip{width:18px;height:3px;border-radius:2px;background:var(--line);transition:background .3s}
+.rt-round-pip.done{background:var(--claude)}.rt-round-pip.active{background:var(--gemini)}
+.rt-transcript{flex:1;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:0}
+.rt-transcript::-webkit-scrollbar{width:5px}
+.rt-transcript::-webkit-scrollbar-track{background:transparent}
+.rt-transcript::-webkit-scrollbar-thumb{background:var(--line);border-radius:3px}
+
+/* ── Empty state ── */
+.rt-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;
+          flex:1;gap:12px;padding:40px;text-align:center}
+.rt-empty-icon{font-size:32px;color:var(--dim)}
+.rt-empty-title{font-size:16px;font-weight:600;color:var(--mut)}
+.rt-empty-sub{font-size:12px;color:var(--dim);max-width:320px;line-height:1.6}
+
+/* ── Round divider ── */
+.rt-round-div{display:flex;align-items:center;gap:10px;margin:20px 0 14px;flex-shrink:0}
+.rt-round-div-line{flex:1;height:1px;background:var(--line)}
+.rt-round-div-label{font-family:var(--mono);font-size:9px;letter-spacing:.15em;
+                    text-transform:uppercase;color:var(--dim);white-space:nowrap;padding:0 4px}
+
+/* ── Turn card ── */
+.rt-turn{border:1px solid var(--line);border-radius:var(--r10);margin-bottom:12px;
+         overflow:hidden;animation:fadeIn .25s ease;flex-shrink:0}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.rt-turn[data-model=claude]{border-left:3px solid var(--claude)}
+.rt-turn[data-model=gpt]{border-left:3px solid var(--gpt)}
+.rt-turn[data-model=gemini]{border-left:3px solid var(--gemini)}
+.rt-turn-head{display:flex;align-items:center;gap:9px;padding:9px 12px;background:var(--card)}
+.rt-av{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;
+       justify-content:center;font-family:var(--mono);font-size:10px;font-weight:700;flex-shrink:0}
+.rt-av-claude{background:var(--claude-soft);color:var(--claude);border:1px solid rgba(0,201,125,.3)}
+.rt-av-gpt{background:var(--gpt-soft);color:var(--gpt);border:1px solid rgba(74,158,224,.3)}
+.rt-av-gemini{background:var(--gemini-soft);color:var(--gemini);border:1px solid rgba(246,173,85,.3)}
+.rt-turn-meta{display:flex;flex-direction:column;gap:1px}
+.rt-model-name{font-size:12px;font-weight:600;color:var(--text)}
+.rt-round-tag{font-family:var(--mono);font-size:9px;letter-spacing:.08em;color:var(--mut)}
+.rt-ts{margin-left:auto;font-family:var(--mono);font-size:9px;color:var(--dim)}
+.rt-turn-body{padding:12px 14px}
+.rt-content{font-size:12px;line-height:1.65;color:var(--text);white-space:pre-wrap;word-break:break-word}
+
+/* ── Position chip ── */
+.rt-pos{display:flex;align-items:flex-start;gap:7px;flex-wrap:wrap;
+        margin-top:10px;padding-top:9px;border-top:1px solid var(--line)}
+.rt-pos-dir{font-family:var(--mono);font-size:10px;font-weight:700;padding:2px 8px;
+            border-radius:20px;letter-spacing:.06em;flex-shrink:0}
+.rt-pos-dir.bull{background:var(--claude-soft);color:var(--claude);border:1px solid rgba(0,201,125,.3)}
+.rt-pos-dir.bear{background:rgba(252,129,129,.1);color:var(--red);border:1px solid rgba(252,129,129,.3)}
+.rt-pos-asset{font-family:var(--mono);font-size:12px;font-weight:700;
+              color:var(--text);padding:2px 0;align-self:center}
+.rt-pos-conf{font-family:var(--mono);font-size:9px;padding:2px 7px;border-radius:20px;
+             align-self:center;letter-spacing:.05em}
+.rt-pos-conf.high{background:rgba(104,211,145,.1);color:#68D391;border:1px solid rgba(104,211,145,.3)}
+.rt-pos-conf.med{background:rgba(113,128,150,.1);color:var(--mut);border:1px solid var(--dim)}
+.rt-pos-thesis{width:100%;font-size:11px;color:var(--mut);line-height:1.45;margin-top:2px;font-style:italic}
+
+/* ── Thinking indicator ── */
+.rt-thinking-dots{display:flex;gap:5px;align-items:center;height:24px}
+.rt-thinking-dots span{width:6px;height:6px;border-radius:50%;background:var(--dim);
+                        animation:blink 1.2s ease-in-out infinite}
+.rt-thinking-dots span:nth-child(2){animation-delay:.2s}
+.rt-thinking-dots span:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,80%,100%{opacity:.2}40%{opacity:1}}
+
+/* ── Convergence banner ── */
+.rt-conv-banner{border-radius:var(--r10);padding:16px 18px;margin:16px 0;
+                border:1px solid var(--line);flex-shrink:0;animation:fadeIn .4s ease}
+.rt-conv-banner.bullish{background:var(--claude-soft);border-color:rgba(0,201,125,.4)}
+.rt-conv-banner.bearish{background:rgba(252,129,129,.08);border-color:rgba(252,129,129,.4)}
+.rt-conv-banner.timeout{background:rgba(113,128,150,.06);border-color:var(--dim)}
+.rt-conv-top{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.rt-conv-icon{font-size:16px}
+.rt-conv-title{font-family:var(--mono);font-size:10px;letter-spacing:.1em;
+               text-transform:uppercase;color:var(--mut)}
+.rt-conv-call{font-size:20px;font-weight:700;margin-bottom:4px;letter-spacing:.02em}
+.rt-conv-call.bullish{color:var(--claude)}.rt-conv-call.bearish{color:var(--red)}.rt-conv-call.neutral{color:var(--mut)}
+.rt-conv-support{font-size:11px;color:var(--mut);margin-bottom:10px}
+.rt-conv-theses{border-top:1px solid var(--line);padding-top:10px;display:flex;flex-direction:column;gap:6px}
+.rt-conv-thesis-row{font-size:11px;color:var(--text);line-height:1.45}
+.rt-conv-thesis-row .lbl{font-family:var(--mono);font-size:9px;letter-spacing:.08em;
+                          text-transform:uppercase;margin-right:5px;color:var(--mut)}
+
+/* ── Error bar ── */
+.rt-error-bar{background:rgba(252,129,129,.1);border:1px solid rgba(252,129,129,.35);
+              border-radius:var(--r6);padding:10px 14px;margin-bottom:12px;
+              font-size:12px;color:var(--red);flex-shrink:0}
+
+/* ── Responsive ── */
+@media(max-width:700px){
+  .rt-sidebar{display:none}
+  .rt-head{padding:9px 12px;gap:8px}
+}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="rt-head">
+  <div class="rt-logo">◈ <b>ROUND TABLE</b></div>
+  <div class="rt-status-wrap">
+    <div class="rt-dot" id="rt-dot"></div>
+    <span id="rt-status-text">IDLE</span>
+  </div>
+  <div class="rt-head-right">
+    <span class="rt-sess-label" id="rt-sess-label"></span>
+    <button class="rt-btn primary" id="rt-new-btn">New Debate</button>
+  </div>
+</div>
+
+<!-- Body -->
+<div class="rt-body">
+
+  <!-- Sidebar -->
+  <div class="rt-sidebar">
+    <div class="rt-sidebar-scroll">
+
+      <!-- Sessions -->
+      <div class="rt-sec">
+        <div class="rt-sec-head">Sessions</div>
+        <div class="rt-sec-body" id="rt-sessions">
+          <div style="font-size:11px;color:var(--mut);padding:4px">No sessions yet.</div>
+        </div>
+      </div>
+
+      <!-- Snapshot -->
+      <div class="rt-sec" id="rt-snap-sec">
+        <div class="rt-sec-head" id="rt-snap-toggle" style="cursor:pointer" onclick="toggleSnap()">
+          Market Snapshot <span class="rt-caret" id="rt-snap-caret">▼</span>
+        </div>
+        <div class="rt-sec-body" id="rt-snap-body">
+          <div style="font-size:11px;color:var(--mut);padding:4px">Start a session to load live data.</div>
+        </div>
+      </div>
+
+      <!-- Consensus -->
+      <div class="rt-sec">
+        <div class="rt-sec-head">Consensus</div>
+        <div class="rt-sec-body" id="rt-con-body">
+          <div class="rt-con-empty">Awaiting debate…</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Transcript -->
+  <div class="rt-transcript-wrap">
+    <div class="rt-transcript-head">
+      <span class="rt-transcript-title">Transcript</span>
+      <div class="rt-round-progress" id="rt-round-pips"></div>
+    </div>
+    <div class="rt-transcript" id="rt-transcript">
+      <div class="rt-empty">
+        <div class="rt-empty-icon">◈</div>
+        <div class="rt-empty-title">No debate running</div>
+        <div class="rt-empty-sub">Click <strong>New Debate</strong> to pull live market data and start a turn-based debate between Claude, GPT-4o, and Gemini.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+'use strict';
+
+// ── State ──
+let currentId = null;
+let sessions = {};
+let sseSource = null;
+let snapCollapsed = false;
+
+const $ = id => document.getElementById(id);
+
+// ── Init ──
+(async () => {
+  try {
+    const res = await fetch('/api/sessions');
+    const list = await res.json();
+    list.forEach(s => { sessions[s.id] = s; });
+    renderSessionList();
+    if (list.length > 0) selectSession(list[0].id);
+  } catch {}
+})();
+
+// ── New debate ──
+$('rt-new-btn').addEventListener('click', async () => {
+  const btn = $('rt-new-btn');
+  btn.disabled = true;
+  btn.textContent = 'Starting…';
+  try {
+    const res = await fetch('/api/session/start', { method: 'POST' });
+    const { sessionId } = await res.json();
+    sessions[sessionId] = { id: sessionId, status: 'starting', rounds: [], createdAt: new Date().toISOString() };
+    renderSessionList();
+    selectSession(sessionId);
+  } catch (err) {
+    alert('Failed to start: ' + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'New Debate';
+  }
+});
+
+// ── Session selection ──
+function selectSession(id) {
+  if (currentId === id && sseSource) return;
+  currentId = id;
+  if (sseSource) { sseSource.close(); sseSource = null; }
+  clearTranscript();
+  renderSessionList();
+  connectSSE(id);
+}
+
+// ── SSE ──
+function connectSSE(id) {
+  sseSource = new EventSource(`/api/session/${id}/stream`);
+  sseSource.onmessage = e => handleEvent(JSON.parse(e.data));
+  sseSource.onerror = () => {
+    sseSource.close();
+    sseSource = null;
+    // Reconnect if session still active
+    const s = sessions[id];
+    if (s && (s.status === 'fetching' || s.status === 'debating' || s.status === 'starting')) {
+      setTimeout(() => { if (currentId === id) connectSSE(id); }, 3000);
+    }
+  };
+}
+
+// ── Event handler ──
+function handleEvent(ev) {
+  switch (ev.type) {
+    case 'hydrate':
+      rebuildFromSession(ev.session);
+      break;
+    case 'status':
+      updateSessionStatus(currentId, ev.status);
+      updateHeader(ev.status);
+      break;
+    case 'snapshot':
+      updateSessionStatus(currentId, ev.status || 'debating');
+      renderSnapshot(ev.snapshot);
+      updateHeader(ev.status || 'debating');
+      break;
+    case 'round-start':
+      appendRoundDivider(ev.roundNumber);
+      updatePips(ev.roundNumber, 'active');
+      break;
+    case 'turn-start':
+      appendThinking(ev.model, ev.roundNumber);
+      break;
+    case 'turn':
+      replaceTurn(ev.model, ev.roundNumber, ev.content, ev.position, ev.timestamp);
+      break;
+    case 'round-end':
+      updatePips(ev.roundNumber, 'done');
+      break;
+    case 'done':
+      renderConsensusSidebar(ev.consensus, ev.status);
+      appendConvBanner(ev.consensus, ev.status);
+      updateSessionStatus(currentId, ev.status);
+      updateHeader(ev.status);
+      break;
+    case 'error':
+      appendError(ev.message);
+      updateSessionStatus(currentId, 'error');
+      updateHeader('error');
+      break;
+  }
+}
+
+// ── Rebuild from hydrate ──
+function rebuildFromSession(s) {
+  sessions[s.id] = s;
+  clearTranscript();
+  updateHeader(s.status);
+
+  if (s.snapshot) renderSnapshot(s.snapshot);
+
+  for (const r of s.rounds || []) {
+    appendRoundDivider(r.roundNumber);
+    for (const t of r.turns) {
+      appendTurnCard(t.model, r.roundNumber, t.content, t.position, t.timestamp);
+    }
+  }
+
+  if (s.consensus) {
+    renderConsensusSidebar(s.consensus, s.status);
+    if (s.status === 'converged' || s.status === 'timeout') {
+      appendConvBanner(s.consensus, s.status);
+    }
+  }
+
+  updatePipsFromSession(s);
+  renderSessionList();
+}
+
+// ── Transcript helpers ──
+function clearTranscript() {
+  const $t = $('rt-transcript');
+  $t.innerHTML = '';
+  $('rt-round-pips').innerHTML = '';
+  $('rt-con-body').innerHTML = '<div class="rt-con-empty">Awaiting debate…</div>';
+  $('rt-snap-body').innerHTML = '<div style="font-size:11px;color:var(--mut);padding:4px">Start a session to load live data.</div>';
+}
+
+function appendRoundDivider(n) {
+  if ($(`rt-div-r${n}`)) return;
+  const $t = $('rt-transcript');
+  // Remove empty state
+  const empty = $t.querySelector('.rt-empty');
+  if (empty) empty.remove();
+
+  const div = document.createElement('div');
+  div.className = 'rt-round-div';
+  div.id = `rt-div-r${n}`;
+  div.innerHTML = `<div class="rt-round-div-line"></div>
+    <span class="rt-round-div-label">Round ${n}</span>
+    <div class="rt-round-div-line"></div>`;
+  $t.appendChild(div);
+  scrollDown();
+}
+
+function appendThinking(model, round) {
+  const id = `rt-thinking-${model}-${round}`;
+  if ($(id)) return;
+  const labels = { claude:'C', gpt:'G', gemini:'Gm' };
+  const names  = { claude:'Claude', gpt:'GPT-4o', gemini:'Gemini' };
+  const el = document.createElement('div');
+  el.className = 'rt-turn';
+  el.dataset.model = model;
+  el.id = id;
+  el.innerHTML = `
+    <div class="rt-turn-head">
+      <div class="rt-av rt-av-${model}">${labels[model]}</div>
+      <div class="rt-turn-meta">
+        <span class="rt-model-name">${names[model]}</span>
+        <span class="rt-round-tag">Round ${round}</span>
+      </div>
+    </div>
+    <div class="rt-turn-body">
+      <div class="rt-thinking-dots"><span></span><span></span><span></span></div>
+    </div>`;
+  $('rt-transcript').appendChild(el);
+  scrollDown();
+}
+
+function replaceTurn(model, round, content, position, ts) {
+  const id = `rt-thinking-${model}-${round}`;
+  const existing = $(id);
+  if (existing) existing.remove();
+  appendTurnCard(model, round, content, position, ts);
+}
+
+function appendTurnCard(model, round, content, position, ts) {
+  if ($(`rt-turn-${model}-${round}`)) return;
+  const labels = { claude:'C', gpt:'G', gemini:'Gm' };
+  const names  = { claude:'Claude', gpt:'GPT-4o', gemini:'Gemini' };
+
+  // Strip <POSITION>...</POSITION> from display
+  const clean = content.replace(/<POSITION>[\s\S]*?<\/POSITION>/gi, '').trim();
+
+  let posHtml = '';
+  if (position) {
+    const dirClass = position.direction === 'bullish' ? 'bull' : 'bear';
+    const dirLabel = position.direction === 'bullish' ? '↑ BULLISH' : '↓ BEARISH';
+    const confClass = position.confidence === 'high' ? 'high' : 'med';
+    posHtml = `<div class="rt-pos">
+      <span class="rt-pos-dir ${dirClass}">${dirLabel}</span>
+      <span class="rt-pos-asset">${esc(position.asset || '')}</span>
+      ${position.confidence ? `<span class="rt-pos-conf ${confClass}">${esc(position.confidence.toUpperCase())}</span>` : ''}
+      ${position.thesis ? `<div class="rt-pos-thesis">"${esc(position.thesis)}"</div>` : ''}
+    </div>`;
+  }
+
+  const timeStr = ts ? new Date(ts).toLocaleTimeString() : '';
+  const el = document.createElement('div');
+  el.className = 'rt-turn';
+  el.dataset.model = model;
+  el.id = `rt-turn-${model}-${round}`;
+  el.innerHTML = `
+    <div class="rt-turn-head">
+      <div class="rt-av rt-av-${model}">${labels[model]}</div>
+      <div class="rt-turn-meta">
+        <span class="rt-model-name">${names[model]}</span>
+        <span class="rt-round-tag">Round ${round}</span>
+      </div>
+      ${timeStr ? `<span class="rt-ts">${timeStr}</span>` : ''}
+    </div>
+    <div class="rt-turn-body">
+      <div class="rt-content">${esc(clean)}</div>
+      ${posHtml}
+    </div>`;
+  $('rt-transcript').appendChild(el);
+  scrollDown();
+}
+
+function appendConvBanner(consensus, status) {
+  if ($('rt-conv-banner')) return;
+  const isConverged = status === 'converged' && consensus.converged;
+  const dirClass = isConverged
+    ? (consensus.direction === 'bullish' ? 'bullish' : 'bearish')
+    : 'timeout';
+  const icon = isConverged ? '⚡' : '⏱';
+  const title = isConverged ? `CONSENSUS — Round reached` : `MAX ROUNDS — Best-effort result`;
+  const callClass = isConverged
+    ? (consensus.direction === 'bullish' ? 'bullish' : 'bearish')
+    : 'neutral';
+  const callText = isConverged
+    ? `${(consensus.direction||'').toUpperCase()} ${consensus.asset || ''}`
+    : (consensus.asset ? `${(consensus.direction||'').toUpperCase()} ${consensus.asset}` : 'No clear consensus');
+  const supportText = isConverged
+    ? `${consensus.supportingModels?.map(m=>capitalise(m)).join(' + ')} (${consensus.supportCount}/3 models)`
+    : consensus.summary || '';
+
+  let thesesHtml = '';
+  if (isConverged && consensus.theses?.length) {
+    thesesHtml = `<div class="rt-conv-theses">${
+      consensus.theses.map(t =>
+        `<div class="rt-conv-thesis-row"><span class="lbl">${capitalise(t.model)}</span>"${esc(t.thesis || '')}"</div>`
+      ).join('')
+    }</div>`;
+  }
+
+  const el = document.createElement('div');
+  el.className = `rt-conv-banner ${dirClass}`;
+  el.id = 'rt-conv-banner';
+  el.innerHTML = `
+    <div class="rt-conv-top">
+      <span class="rt-conv-icon">${icon}</span>
+      <span class="rt-conv-title">${title}</span>
+    </div>
+    <div class="rt-conv-call ${callClass}">${callText}</div>
+    <div class="rt-conv-support">${esc(supportText)}</div>
+    ${thesesHtml}`;
+  $('rt-transcript').appendChild(el);
+  scrollDown();
+}
+
+function appendError(msg) {
+  const el = document.createElement('div');
+  el.className = 'rt-error-bar';
+  el.textContent = `Error: ${msg}`;
+  $('rt-transcript').appendChild(el);
+  scrollDown();
+}
+
+// ── Snapshot sidebar ──
+function renderSnapshot(snap) {
+  const crypto = (snap.crypto || []).slice(0, 6);
+  const poly = (snap.polymarket || []).slice(0, 4);
+
+  let html = crypto.map(c => {
+    const p = c.price >= 1000
+      ? `$${c.price.toLocaleString('en-US', { maximumFractionDigits: 0 })}`
+      : `$${c.price.toFixed(3)}`;
+    const d = c.change24h;
+    const cls = d == null ? 'flat' : d > 0 ? 'pos' : d < 0 ? 'neg' : 'flat';
+    const dStr = d == null ? '' : `${d >= 0 ? '+' : ''}${d.toFixed(1)}%`;
+    return `<div class="rt-snap-row">
+      <span class="rt-snap-sym">${esc(c.symbol)}</span>
+      <span class="rt-snap-price">${p}</span>
+      <span class="rt-snap-chg ${cls}">${dStr}</span>
+    </div>`;
+  }).join('');
+
+  if (poly.length) {
+    html += `<div style="margin-top:10px;margin-bottom:4px;font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)">Prediction Markets</div>`;
+    html += poly.map(m => {
+      const prStr = (m.prices || []).map((p, i) =>
+        `${m.outcomes[i] || '?'}: ${(parseFloat(p)*100).toFixed(0)}%`
+      ).join(' · ');
+      return `<div class="rt-snap-poly"><div class="rt-snap-q">${esc(m.question)}</div>
+        <div class="rt-snap-pr">${esc(prStr)}</div></div>`;
+    }).join('');
+  }
+
+  $('rt-snap-body').innerHTML = html;
+}
+
+// ── Consensus sidebar ──
+function renderConsensusSidebar(consensus, status) {
+  if (!consensus) return;
+  const isConverged = status === 'converged' && consensus.converged;
+  const dirClass = isConverged
+    ? (consensus.direction === 'bullish' ? 'bullish' : 'bearish')
+    : 'timeout';
+  const callClass = isConverged
+    ? (consensus.direction === 'bullish' ? 'bullish' : 'bearish')
+    : 'neutral';
+  const callText = isConverged
+    ? `${(consensus.direction||'').toUpperCase()} ${consensus.asset || ''}`
+    : (consensus.asset ? `${(consensus.direction||'').toUpperCase()} ${consensus.asset}` : 'No consensus');
+  const supportText = isConverged
+    ? `${consensus.supportingModels?.map(m=>capitalise(m)).join(' + ')} agree`
+    : `${consensus.supportCount || 0}/3 models`;
+
+  let thesesHtml = '';
+  if (isConverged && consensus.theses?.length) {
+    thesesHtml = `<div class="rt-con-thesis">${
+      consensus.theses.map(t =>
+        `<p><span class="rt-con-model">${capitalise(t.model)}</span>"${esc(t.thesis || '')}"</p>`
+      ).join('')
+    }</div>`;
+  } else if (!isConverged && consensus.summary) {
+    thesesHtml = `<div class="rt-con-thesis"><p>${esc(consensus.summary)}</p></div>`;
+  }
+
+  $('rt-con-body').innerHTML = `<div class="rt-con-box ${dirClass}">
+    <div class="rt-con-label">${isConverged ? 'CONVERGED' : 'BEST EFFORT'}</div>
+    <div class="rt-con-call ${callClass}">${callText}</div>
+    <div class="rt-con-support">${esc(supportText)}</div>
+    ${thesesHtml}
+  </div>`;
+}
+
+// ── Round progress pips ──
+function updatePips(roundNum, state) {
+  let pips = $('rt-round-pips');
+  let pip = pips.querySelector(`[data-round="${roundNum}"]`);
+  if (!pip) {
+    // Create pips up to MAX_ROUNDS=4 if not present
+    for (let i = 1; i <= 4; i++) {
+      if (!pips.querySelector(`[data-round="${i}"]`)) {
+        const p = document.createElement('div');
+        p.className = 'rt-round-pip';
+        p.dataset.round = i;
+        pips.appendChild(p);
+      }
+    }
+    pip = pips.querySelector(`[data-round="${roundNum}"]`);
+  }
+  if (pip) {
+    pip.classList.remove('done', 'active');
+    pip.classList.add(state);
+  }
+}
+
+function updatePipsFromSession(s) {
+  const pips = $('rt-round-pips');
+  pips.innerHTML = '';
+  for (let i = 1; i <= 4; i++) {
+    const p = document.createElement('div');
+    p.className = 'rt-round-pip';
+    p.dataset.round = i;
+    const r = (s.rounds || []).find(r => r.roundNumber === i);
+    if (r) p.classList.add(r.converged || s.status === 'converged' ? 'done' : 'done');
+    pips.appendChild(p);
+  }
+}
+
+// ── Header status ──
+function updateHeader(status) {
+  const dot = $('rt-dot');
+  const txt = $('rt-status-text');
+  dot.className = 'rt-dot';
+  const labels = {
+    starting: 'STARTING', fetching: 'FETCHING DATA', debating: 'LIVE',
+    converged: 'CONVERGED', timeout: 'CONCLUDED', error: 'ERROR', idle: 'IDLE'
+  };
+  txt.textContent = labels[status] || status.toUpperCase();
+  if (status === 'fetching' || status === 'debating' || status === 'starting') dot.classList.add('live');
+  else if (status === 'converged') dot.classList.add('converged');
+  else if (status === 'error') dot.classList.add('error');
+
+  if (currentId) {
+    $('rt-sess-label').textContent = currentId.slice(0, 8);
+  }
+}
+
+// ── Session list ──
+function updateSessionStatus(id, status) {
+  if (!sessions[id]) sessions[id] = { id, status };
+  sessions[id].status = status;
+  renderSessionList();
+}
+
+function renderSessionList() {
+  const $sl = $('rt-sessions');
+  const sorted = Object.values(sessions).sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+  if (!sorted.length) {
+    $sl.innerHTML = '<div style="font-size:11px;color:var(--mut);padding:4px">No sessions yet.</div>';
+    return;
+  }
+  const statusLabel = { starting:'Starting…', fetching:'Fetching data…', debating:'Debating…',
+                        converged:'Converged', timeout:'Concluded', error:'Error', idle:'Idle' };
+  $sl.innerHTML = sorted.map(s => `
+    <div class="rt-session-item ${s.id === currentId ? 'active' : ''}"
+         onclick="selectSession('${s.id}')">
+      <div class="rt-sess-dot ${s.status || ''}"></div>
+      <div class="rt-sess-info">
+        <div class="rt-sess-id">${s.id.slice(0, 8)}</div>
+        <div class="rt-sess-meta">${statusLabel[s.status] || s.status || ''}</div>
+      </div>
+    </div>`).join('');
+}
+
+// ── Snapshot toggle ──
+function toggleSnap() {
+  snapCollapsed = !snapCollapsed;
+  $('rt-snap-body').style.display = snapCollapsed ? 'none' : '';
+  $('rt-snap-caret').textContent = snapCollapsed ? '▶' : '▼';
+}
+
+// ── Utilities ──
+function scrollDown() {
+  const $t = $('rt-transcript');
+  $t.scrollTop = $t.scrollHeight;
+}
+
+function esc(s) {
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/\n/g,'<br>');
+}
+
+function capitalise(s) {
+  const map = { claude:'Claude', gpt:'GPT-4o', gemini:'Gemini' };
+  return map[s] || (s ? s.charAt(0).toUpperCase() + s.slice(1) : s);
+}
+</script>
+</body>
+</html>
