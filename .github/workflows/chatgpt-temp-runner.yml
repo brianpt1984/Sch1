@@ -1,0 +1,11 @@
+name: Temporary Public Runner Probe
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "public-runner-ok"
